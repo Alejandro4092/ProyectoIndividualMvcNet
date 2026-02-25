@@ -1,0 +1,185 @@
+﻿@model IEnumerable<ProyectoIndividualMvcNet.Models.Juego>
+
+@{
+    ViewData["Title"] = "Tienda de Juegos";
+    var isAdmin = ViewBag.IsAdmin ?? false;
+    var texto = ViewData["TEXTO"] as string ?? "";
+    var genero = ViewData["GENERO"] as string ?? "";
+    var plataforma = ViewData["PLATAFORMA"] as string ?? "";
+}
+
+<!-- Hero Section -->
+<div class="bg-dark text-white py-5 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-controller me-2"></i>Catálogo de Juegos
+                </h1>
+                <p class="lead mb-0">Descubre nuestra increíble colección de videojuegos</p>
+            </div>
+            @if (isAdmin)
+            {
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a asp-action="Create" class="btn btn-success btn-lg shadow">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar Nuevo Juego
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Filtros y búsqueda -->
+<div class="container mb-4">
+    <form asp-action="Index" method="get">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" name="texto" class="form-control" placeholder="Buscar juegos..." value="@texto">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="genero" class="form-select">
+                    <option value="">Todos los géneros</option>
+                    <option value="Acción" selected="@(genero == "Acción")">Acción</option>
+                    <option value="Aventura" selected="@(genero == "Aventura")">Aventura</option>
+                    <option value="RPG" selected="@(genero == "RPG")">RPG</option>
+                    <option value="Deportes" selected="@(genero == "Deportes")">Deportes</option>
+                    <option value="Estrategia" selected="@(genero == "Estrategia")">Estrategia</option>
+                    <option value="Simulación" selected="@(genero == "Simulación")">Simulación</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="plataforma" class="form-select">
+                    <option value="">Todas las plataformas</option>
+                    <option value="PlayStation" selected="@(plataforma == "PlayStation")">PlayStation</option>
+                    <option value="Xbox" selected="@(plataforma == "Xbox")">Xbox</option>
+                    <option value="Nintendo Switch" selected="@(plataforma == "Nintendo Switch")">Nintendo Switch</option>
+                    <option value="PC" selected="@(plataforma == "PC")">PC</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel-fill me-2"></i>Buscar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var juego in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm hover-shadow transition">
+                        <!-- Imagen del juego -->
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            @if (!string.IsNullOrEmpty(juego.Img))
+                            {
+                                <img src="@juego.Img" class="card-img-top object-fit-cover h-100" alt="@juego.Titulo">
+                            }
+                            else
+                            {
+                                <div class="bg-secondary d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-controller text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            }
+                            
+                            <!-- Badge de stock -->
+                            @if (juego.Stock > 0)
+                            {
+                                <span class="badge bg-success position-absolute top-0 end-0 m-2">
+                                    <i class="bi bi-check-circle me-1"></i>Disponible
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                    <i class="bi bi-x-circle me-1"></i>Agotado
+                                </span>
+                            }
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <!-- Título -->
+                            <h5 class="card-title fw-bold text-truncate mb-2" title="@juego.Titulo">
+                                @juego.Titulo
+                            </h5>
+
+                            <!-- Descripción -->
+                            <p class="card-text text-muted small mb-3" style="height: 60px; overflow: hidden;">
+                                @(juego.Descripcion?.Length > 100 ? juego.Descripcion.Substring(0, 100) + "..." : juego.Descripcion)
+                            </p>
+
+                            <!-- Géneros y Plataforma -->
+                            <div class="mb-3">
+                                @if (!string.IsNullOrEmpty(juego.Genero))
+                                {
+                                    <span class="badge bg-primary me-1">
+                                        <i class="bi bi-tag-fill me-1"></i>@juego.Genero
+                                    </span>
+                                }
+                                @if (!string.IsNullOrEmpty(juego.Plataforma))
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-joystick me-1"></i>@juego.Plataforma
+                                    </span>
+                                }
+                            </div>
+
+                      
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="text-success fw-bold mb-0">@juego.Precio.ToString("C")</h4>
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-seam me-1"></i>Stock: @juego.Stock
+                                    </small>
+                                </div>
+
+                              
+                                <div class="btn-group w-100" role="group">
+                                    <a asp-action="Details" asp-route-idjuego="@juego.Id" 
+                                       class="btn btn-outline-primary btn-sm" 
+                                       title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-idjuego="@juego.Id"
+                                       class="btn btn-outline-warning btn-sm" 
+                                       title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-idjuego="@juego.Id"
+                                       class="btn btn-outline-danger btn-sm" 
+                                       title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Mensaje cuando no hay juegos -->
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-3" style="font-size: 2rem;"></i>
+            <div>
+                <h4 class="alert-heading">No hay juegos disponibles</h4>
+                <p class="mb-0">No se encontraron juegos con los filtros seleccionados. Intenta con otros criterios de búsqueda.</p>
+            </div>
+        </div>
+    }
+</div>

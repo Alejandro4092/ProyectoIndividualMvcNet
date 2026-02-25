@@ -1,0 +1,241 @@
+﻿@model ProyectoIndividualMvcNet.Models.Juego
+
+@{
+    ViewData["Title"] = "Agregar Nuevo Juego";
+}
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-white">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="Index" class="text-decoration-none text-white">
+                    <i class="bi bi-controller"></i> Juegos
+                </a>
+            </li>
+            <li class="breadcrumb-item active" style="color: var(--gaming-primary, #00d9ff);" aria-current="page">
+                Agregar Nuevo
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Header -->
+<div class="container mb-4">
+    <div class="text-center">
+        <h1 class="display-4 fw-bold text-white mb-2">
+            <i class="bi bi-plus-circle me-3" style="color: var(--gaming-primary, #00d9ff);"></i>
+            Agregar Nuevo Juego
+        </h1>
+        <p class="lead text-white-50">Completa la información del juego para agregarlo al catálogo</p>
+    </div>
+</div>
+
+<!-- Formulario -->
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-dark border-0 shadow-lg">
+                <div class="card-header border-0 py-4" style="background: linear-gradient(90deg, var(--gaming-primary, #00d9ff) 0%, transparent 100%);">
+                    <h4 class="mb-0 text-white">
+                        <i class="bi bi-file-earmark-plus me-2"></i>Información del Juego
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 mb-4" role="alert"></div>
+
+                        <!-- Título -->
+                        <div class="mb-4">
+                            <label asp-for="Titulo" class="form-label text-white fw-bold">
+                                <i class="bi bi-type me-2"></i>Título del Juego
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Titulo" 
+                                   class="form-control form-control-lg bg-dark text-white border-secondary" 
+                                   placeholder="Ej: The Legend of Zelda: Breath of the Wild" />
+                            <span asp-validation-for="Titulo" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <label asp-for="Descripcion" class="form-label text-white fw-bold">
+                                <i class="bi bi-text-paragraph me-2"></i>Descripción
+                            </label>
+                            <textarea asp-for="Descripcion" 
+                                      class="form-control bg-dark text-white border-secondary" 
+                                      rows="4" 
+                                      placeholder="Describe las características y detalles del juego..."></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Género y Plataforma en fila -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Genero" class="form-label text-white fw-bold">
+                                    <i class="bi bi-tag-fill me-2"></i>Género
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Genero" 
+                                        class="form-select form-select-lg bg-dark text-white border-secondary">
+                                    <option value="">Selecciona un género</option>
+                                    <option value="Acción">Acción</option>
+                                    <option value="Aventura">Aventura</option>
+                                    <option value="RPG">RPG</option>
+                                    <option value="Deportes">Deportes</option>
+                                    <option value="Estrategia">Estrategia</option>
+                                    <option value="Simulación">Simulación</option>
+                                    <option value="Terror">Terror</option>
+                                    <option value="Lucha">Lucha</option>
+                                    <option value="Carreras">Carreras</option>
+                                    <option value="Plataformas">Plataformas</option>
+                                </select>
+                                <span asp-validation-for="Genero" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Plataforma" class="form-label text-white fw-bold">
+                                    <i class="bi bi-joystick me-2"></i>Plataforma
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="Plataforma" 
+                                        class="form-select form-select-lg bg-dark text-white border-secondary">
+                                    <option value="">Selecciona una plataforma</option>
+                                    <option value="PlayStation">PlayStation</option>
+                                    <option value="Xbox">Xbox</option>
+                                    <option value="Nintendo Switch">Nintendo Switch</option>
+                                    <option value="PC">PC</option>
+                                    <option value="PlayStation 5">PlayStation 5</option>
+                                    <option value="Xbox Series X|S">Xbox Series X|S</option>
+                                    <option value="Multi-Plataforma">Multi-Plataforma</option>
+                                </select>
+                                <span asp-validation-for="Plataforma" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Precio y Stock en fila -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Precio" class="form-label text-white fw-bold">
+                                    <i class="bi bi-currency-dollar me-2"></i>Precio
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-dark text-white border-secondary">$</span>
+                                    <input asp-for="Precio" 
+                                           type="number" 
+                                           step="0.01" 
+                                           class="form-control bg-dark text-white border-secondary" 
+                                           placeholder="0.00" />
+                                </div>
+                                <span asp-validation-for="Precio" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Stock" class="form-label text-white fw-bold">
+                                    <i class="bi bi-box-seam me-2"></i>Stock Disponible
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Stock" 
+                                       type="number" 
+                                       class="form-control form-control-lg bg-dark text-white border-secondary" 
+                                       placeholder="0" />
+                                <span asp-validation-for="Stock" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- URL de Imagen -->
+                        <div class="mb-4">
+                            <label asp-for="Img" class="form-label text-white fw-bold">
+                                <i class="bi bi-image me-2"></i>URL de la Imagen
+                            </label>
+                            <input asp-for="Img" 
+                                   class="form-control form-control-lg bg-dark text-white border-secondary" 
+                                   placeholder="https://ejemplo.com/imagen.jpg" />
+                            <span asp-validation-for="Img" class="text-danger small"></span>
+                            <small class="text-white-50 d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Proporciona la URL de una imagen del juego (opcional)
+                            </small>
+                        </div>
+
+                        <!-- Estado Activo -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input asp-for="Activo" 
+                                       class="form-check-input" 
+                                       type="checkbox" 
+                                       id="checkActivo"
+                                       checked
+                                       style="width: 3rem; height: 1.5rem; cursor: pointer;">
+                                <label class="form-check-label text-white fw-bold ms-2" for="checkActivo">
+                                    <i class="bi bi-toggle-on me-2"></i>Juego Activo
+                                </label>
+                            </div>
+                            <small class="text-white-50 d-block ms-5">
+                                Los juegos activos se mostrarán en el catálogo público
+                            </small>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-5">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <button type="submit" class="btn btn-lg w-100 shadow-lg" style="background: var(--gaming-primary, #00d9ff); color: #000; font-weight: bold;">
+                                    <i class="bi bi-check-circle me-2"></i>Guardar Juego
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a asp-action="Index" class="btn btn-outline-light btn-lg w-100">
+                                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+}
+
+<style>
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #1a1a2e !important;
+        color: white !important;
+        border-color: var(--gaming-primary, #00d9ff) !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 217, 255, 0.25) !important;
+    }
+
+    .form-select option {
+        background-color: #1a1a2e;
+        color: white;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--gaming-primary, #00d9ff);
+        border-color: var(--gaming-primary, #00d9ff);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--gaming-primary, #00d9ff);
+        box-shadow: 0 0 0 0.25rem rgba(0, 217, 255, 0.25);
+    }
+
+    /* Variables CSS fallback */
+    :root {
+        --gaming-primary: #00d9ff;
+        --gaming-secondary: #8b5cf6;
+        --gaming-accent: #ff006e;
+    }
+</style>

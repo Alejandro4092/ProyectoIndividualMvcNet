@@ -1,0 +1,328 @@
+﻿@model ProyectoIndividualMvcNet.Models.Juego
+
+@{
+    ViewData["Title"] = Model.Titulo;
+    var isAdmin = ViewBag.IsAdmin ?? false;
+}
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index" class="text-decoration-none">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="Index" class="text-decoration-none">
+                    <i class="bi bi-controller"></i> Juegos
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-white" aria-current="page">@Model.Titulo</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Detalles del Juego -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <!-- Columna Izquierda: Imagen y Galería -->
+        <div class="col-lg-5">
+            <!-- Imagen Principal -->
+            <div class="card bg-dark border-0 shadow-lg sticky-top" style="top: 100px;">
+                <div class="position-relative overflow-hidden rounded-3">
+                    @if (!string.IsNullOrEmpty(Model.Img))
+                    {
+                        <img src="@Model.Img" class="img-fluid w-100" alt="@Model.Titulo" style="max-height: 500px; object-fit: cover;">
+                        <div class="position-absolute top-0 start-0 w-100 h-100"
+                             style="background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7) 100%);"></div>
+                    }
+                    else
+                    {
+                        <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 400px;">
+                            <i class="bi bi-controller text-white" style="font-size: 5rem; opacity: 0.3;"></i>
+                        </div>
+                    }
+
+                    <!-- Badges Superpuestos -->
+                    <div class="position-absolute top-0 start-0 m-3">
+                        @if (Model.Stock > 0)
+                        {
+                            <span class="badge bg-success fs-6 px-3 py-2 shadow">
+                                <i class="bi bi-check-circle me-1"></i>En Stock (@Model.Stock disponibles)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger fs-6 px-3 py-2 shadow">
+                                <i class="bi bi-x-circle me-1"></i>Agotado
+                            </span>
+                        }
+                    </div>
+
+                    @if (Model.Activo)
+                    {
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge" style="background: var(--gaming-primary); color: #000; font-size: 0.9rem; padding: 8px 15px;">
+                                <i class="bi bi-star-fill me-1"></i>Activo
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Precio y Acción -->
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <small class="text-muted d-block mb-1">Precio</small>
+                            <h2 class="mb-0 fw-bold" style="color: var(--gaming-primary);">
+                                @Model.Precio.ToString("C")
+                            </h2>
+                        </div>
+                        @if (Model.Stock > 0)
+                        {
+                            <button class="btn btn-gaming btn-lg shadow-lg">
+                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-x-circle me-2"></i>No Disponible
+                            </button>
+                        }
+                    </div>
+
+                    <!-- Botones de acción secundarios -->
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-light">
+                            <i class="bi bi-heart me-2"></i>Añadir a Favoritos
+                        </button>
+                        <button class="btn btn-outline-light">
+                            <i class="bi bi-share me-2"></i>Compartir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Información del Juego -->
+        <div class="col-lg-7">
+            <!-- Encabezado -->
+            <div class="mb-4">
+                <h1 class="display-4 fw-bold text-white mb-3">@Model.Titulo</h1>
+
+                <!-- Tags -->
+                <div class="mb-4">
+                    @if (!string.IsNullOrEmpty(Model.Genero))
+                    {
+                        <span class="badge bg-primary fs-6 px-3 py-2 me-2">
+                            <i class="bi bi-tag-fill me-1"></i>@Model.Genero
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.Plataforma))
+                    {
+                        <span class="badge bg-info fs-6 px-3 py-2">
+                            <i class="bi bi-joystick me-1"></i>@Model.Plataforma
+                        </span>
+                    }
+                </div>
+
+                <!-- Calificación (simulada) -->
+                <div class="d-flex align-items-center mb-4">
+                    <div class="text-warning me-2" style="font-size: 1.5rem;">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                    </div>
+                    <span class="text-muted">4.5 / 5.0 (128 reseñas)</span>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-primary) 0%, transparent 100%);">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-info-circle me-2"></i>Descripción
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Descripcion))
+                    {
+                        <p class="text-light fs-5 mb-0 lh-lg">@Model.Descripcion</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0">Sin descripción disponible.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Detalles Técnicos -->
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-secondary) 0%, transparent 100%);">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-list-check me-2"></i>Detalles Técnicos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-hash me-1"></i>ID del Producto
+                                </small>
+                                <strong class="text-white fs-5">#@Model.Id.ToString("D5")</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-tag me-1"></i>Género
+                                </small>
+                                <strong class="text-white fs-5">@(Model.Genero ?? "No especificado")</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-joystick me-1"></i>Plataforma
+                                </small>
+                                <strong class="text-white fs-5">@(Model.Plataforma ?? "No especificado")</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="bi bi-box-seam me-1"></i>Stock Disponible
+                                </small>
+                                <strong class="fs-5" style="color: @(Model.Stock > 0 ? "var(--gaming-primary)" : "var(--gaming-accent)");">
+                                    @Model.Stock unidades
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Características -->
+            <div class="card bg-dark border-0 shadow mb-4">
+                <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-accent) 0%, transparent 100%);">
+                    <h5 class="mb-0 text-white">
+                        <i class="bi bi-shield-check me-2"></i>Características
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 text-light">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-2 fs-5"></i>
+                                <span>Envío gratis en compras superiores a 50€</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-2 fs-5"></i>
+                                <span>Devolución en 30 días</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-2 fs-5"></i>
+                                <span>Garantía oficial del fabricante</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-2 fs-5"></i>
+                                <span>Pago seguro 100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Administrador -->
+            @if (isAdmin)
+            {
+                <div class="card border-warning shadow mb-4">
+                    <div class="card-header bg-warning text-dark py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-shield-lock-fill me-2"></i>Panel de Administrador
+                        </h5>
+                    </div>
+                    <div class="card-body bg-dark">
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning flex-fill">
+                                <i class="bi bi-pencil-square me-2"></i>Editar Juego
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger flex-fill">
+                                <i class="bi bi-trash me-2"></i>Eliminar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Botón Volver -->
+            <div class="text-center mt-4">
+                <a asp-action="Index" class="btn btn-outline-light btn-lg px-5">
+                    <i class="bi bi-arrow-left me-2"></i>Volver al Catálogo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Reseñas (Simulada) -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-header border-0 py-4" style="background: linear-gradient(90deg, var(--gaming-primary) 0%, transparent 100%);">
+                    <h4 class="mb-0 text-white">
+                        <i class="bi bi-chat-square-quote me-2"></i>Reseñas de Usuarios
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Reseña ejemplo -->
+                    <div class="border-bottom border-secondary pb-4 mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="user-avatar me-3" style="width: 50px; height: 50px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-white mb-0">Usuario123</h6>
+                                <div class="text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                    <i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                            <small class="text-muted ms-auto">Hace 2 días</small>
+                        </div>
+                        <p class="text-light mb-0">¡Increíble juego! La jugabilidad es excelente y los gráficos son impresionantes. Totalmente recomendado.</p>
+                    </div>
+
+                    <!-- Botón para más reseñas -->
+                    <div class="text-center">
+                        <button class="btn btn-outline-light">
+                            <i class="bi bi-plus-circle me-2"></i>Cargar más reseñas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sticky-top {
+        position: sticky;
+        top: 100px;
+        z-index: 10;
+    }
+</style>
