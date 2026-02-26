@@ -1,8 +1,15 @@
-﻿@model ProyectoIndividualMvcNet.Models.Juego
+﻿@using ProyectoIndividualMvcNet.Extensions
+@model ProyectoIndividualMvcNet.Models.Juego
 
 @{
     ViewData["Title"] = Model.Titulo;
     var isAdmin = ViewBag.IsAdmin ?? false;
+    var resenas = ViewBag.Resenas as List<ProyectoIndividualMvcNet.Models.Resena> ?? new List<ProyectoIndividualMvcNet.Models.Resena>();
+    var usuario = Context.Session.GetObject<ProyectoIndividualMvcNet.Models.Usuario>("USUARIO");
+
+    // Calcular promedio de calificación
+    double promedioNota = resenas.Any() ? resenas.Average(r => r.Nota) : 0;
+    int totalResenas = resenas.Count;
 }
 
 <!-- Breadcrumb -->
@@ -82,9 +89,12 @@
                         </div>
                         @if (Model.Stock > 0)
                         {
-                            <button class="btn btn-gaming btn-lg shadow-lg">
-                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
-                            </button>
+                            <form asp-action="AgregarAlCarrito" method="post">
+                                <input type="hidden" name="idJuego" value="@Model.Id" />
+                                <button type="submit" class="btn btn-gaming btn-lg shadow-lg">
+                                    <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+                                </button>
+                            </form>
                         }
                         else
                         {
@@ -129,16 +139,26 @@
                     }
                 </div>
 
-                <!-- Calificación (simulada) -->
+                <!-- Calificación Real -->
                 <div class="d-flex align-items-center mb-4">
                     <div class="text-warning me-2" style="font-size: 1.5rem;">
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-fill"></i>
-                        <i class="bi bi-star-half"></i>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Math.Floor(promedioNota))
+                            {
+                                <i class="bi bi-star-fill"></i>
+                            }
+                            else if (i - 0.5 <= promedioNota)
+                            {
+                                <i class="bi bi-star-half"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-star"></i>
+                            }
+                        }
                     </div>
-                    <span class="text-muted">4.5 / 5.0 (128 reseñas)</span>
+                    <span class="text-muted">@promedioNota.ToString("F1") / 5.0 (@totalResenas reseñas)</span>
                 </div>
             </div>
 
@@ -256,10 +276,10 @@
                     </div>
                     <div class="card-body bg-dark">
                         <div class="d-flex gap-2">
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning flex-fill">
+                            <a asp-action="Edit" asp-route-idjuego="@Model.Id" class="btn btn-warning flex-fill">
                                 <i class="bi bi-pencil-square me-2"></i>Editar Juego
                             </a>
-                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger flex-fill">
+                            <a asp-action="Delete" asp-route-idjuego="@Model.Id" class="btn btn-danger flex-fill">
                                 <i class="bi bi-trash me-2"></i>Eliminar
                             </a>
                         </div>
@@ -276,48 +296,171 @@
         </div>
     </div>
 
-    <!-- Sección de Reseñas (Simulada) -->
+    <!-- Sección de Reseñas -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="card bg-dark border-0 shadow">
                 <div class="card-header border-0 py-4" style="background: linear-gradient(90deg, var(--gaming-primary) 0%, transparent 100%);">
                     <h4 class="mb-0 text-white">
-                        <i class="bi bi-chat-square-quote me-2"></i>Reseñas de Usuarios
+                        <i class="bi bi-chat-square-quote me-2"></i>Reseñas de Usuarios (@totalResenas)
                     </h4>
                 </div>
                 <div class="card-body">
-                    <!-- Reseña ejemplo -->
-                    <div class="border-bottom border-secondary pb-4 mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="user-avatar me-3" style="width: 50px; height: 50px;">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white mb-0">Usuario123</h6>
-                                <div class="text-warning">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                </div>
-                            </div>
-                            <small class="text-muted ms-auto">Hace 2 días</small>
-                        </div>
-                        <p class="text-light mb-0">¡Increíble juego! La jugabilidad es excelente y los gráficos son impresionantes. Totalmente recomendado.</p>
-                    </div>
+                    <!-- Formulario para agregar reseña -->
+                    @if (usuario != null)
+                    {
+                        <div class="mb-4 p-4 rounded" style="background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2);">
+                            <h5 class="text-white mb-3">
+                                <i class="bi bi-pencil-square me-2" style="color: var(--gaming-primary);"></i>
+                                Escribe tu reseña
+                            </h5>
+                            <form asp-action="PostResena" method="post">
+                                <input type="hidden" name="idJuego" value="@Model.Id" />
 
-                    <!-- Botón para más reseñas -->
-                    <div class="text-center">
-                        <button class="btn btn-outline-light">
-                            <i class="bi bi-plus-circle me-2"></i>Cargar más reseñas
-                        </button>
-                    </div>
+                                <!-- Selector de calificación -->
+                                <div class="mb-3">
+                                    <label class="form-label text-white fw-bold">
+                                        <i class="bi bi-star-fill text-warning me-2"></i>Calificación
+                                    </label>
+                                    <div class="d-flex gap-2">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            int rating = i;
+                                            <label class="star-rating-label">
+                                                <input type="radio" name="nota" value="@rating" required class="d-none" />
+                                                <i class="bi bi-star fs-2" data-rating="@rating"></i>
+                                            </label>
+                                        }
+                                    </div>
+                                    <small class="text-muted">Haz clic en las estrellas para calificar</small>
+                                </div>
+
+                                <!-- Campo de comentario -->
+                                <div class="mb-3">
+                                    <label for="comentario" class="form-label text-white fw-bold">
+                                        <i class="bi bi-chat-left-text me-2"></i>Tu opinión
+                                    </label>
+                                    <textarea name="comentario"
+                                          id="comentario"
+                                          class="form-control bg-dark text-white border-secondary"
+                                          rows="4"
+                                          placeholder="Comparte tu experiencia con este juego..."
+                                          required
+                                          maxlength="500"></textarea>
+                                    <small class="text-muted">Máximo 500 caracteres</small>
+                                </div>
+
+                                <!-- Botón enviar -->
+                                <button type="submit" class="btn btn-lg shadow-lg w-100" style="background: var(--gaming-primary); color: #000; font-weight: bold;">
+                                    <i class="bi bi-send me-2"></i>Publicar Reseña
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info d-flex align-items-center mb-4">
+                            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <strong>Inicia sesión para dejar una reseña</strong>
+                                <p class="mb-0 mt-1">
+                                    <a asp-controller="Usuarios" asp-action="Login" class="text-decoration-none" style="color: var(--gaming-primary);">
+                                        Haz clic aquí para iniciar sesión
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Lista de reseñas -->
+                    @if (resenas.Any())
+                    {
+                        <div id="resenas-container">
+                            @foreach (var resena in resenas)
+                            {
+                                <div class="border-bottom border-secondary pb-4 mb-4 resena-item">
+                                    <div class="d-flex align-items-start mb-2">
+                                        <div class="user-avatar me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                                            @if (!string.IsNullOrEmpty(resena.Usuario?.Imagen))
+                                            {
+                                                <img src="@resena.Usuario.Imagen" class="rounded-circle w-100 h-100" style="object-fit: cover;" alt="Avatar" />
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-person-fill"></i>
+                                            }
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <h6 class="text-white mb-1">@(resena.Usuario?.Nombre ?? "Usuario")</h6>
+                                                    <div class="text-warning">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            if (i <= resena.Nota)
+                                                            {
+                                                                <i class="bi bi-star-fill"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-star"></i>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">@GetTiempoTranscurrido(resena.Fecha)</small>
+                                            </div>
+                                            <p class="text-light mb-0">@resena.Comentario</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-chat-square-quote" style="font-size: 4rem; color: var(--gaming-primary); opacity: 0.3;"></i>
+                            <h5 class="text-muted mt-3">No hay reseñas todavía</h5>
+                            <p class="text-muted">¡Sé el primero en compartir tu opinión sobre este juego!</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Notificación de éxito -->
+@if (TempData["MENSAJE"] != null)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert">
+            <div class="toast-header" style="background: var(--gaming-primary); color: #000;">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong class="me-auto">¡Éxito!</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body bg-dark text-white">
+                @TempData["MENSAJE"]
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+    string GetTiempoTranscurrido(DateTime fecha)
+    {
+        var tiempo = DateTime.Now - fecha;
+
+        if (tiempo.TotalMinutes < 1) return "Hace un momento";
+        if (tiempo.TotalMinutes < 60) return $"Hace {(int)tiempo.TotalMinutes} minutos";
+        if (tiempo.TotalHours < 24) return $"Hace {(int)tiempo.TotalHours} horas";
+        if (tiempo.TotalDays < 30) return $"Hace {(int)tiempo.TotalDays} días";
+        if (tiempo.TotalDays < 365) return $"Hace {(int)(tiempo.TotalDays / 30)} meses";
+        return $"Hace {(int)(tiempo.TotalDays / 365)} años";
+    }
+}
 
 <style>
     .sticky-top {
@@ -325,4 +468,97 @@
         top: 100px;
         z-index: 10;
     }
+
+    /* Estilo para el sistema de estrellas */
+    .star-rating-label {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .star-rating-label i {
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+
+        .star-rating-label:hover i,
+        .star-rating-label:hover ~ .star-rating-label i,
+        .star-rating-label input:checked ~ i,
+        .star-rating-label input:checked ~ .star-rating-label i {
+            color: #ffc107 !important;
+        }
+
+        /* Efecto hover en las estrellas de calificación */
+        .star-rating-label:hover i {
+            color: #ffc107 !important;
+            transform: scale(1.2);
+        }
+
+    /* Animación para las reseñas */
+    .resena-item {
+        animation: fadeInUp 0.5s ease;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Toast notification */
+    .toast {
+        border: 2px solid var(--gaming-primary);
+    }
 </style>
+
+<script>
+    // Sistema de calificación con estrellas
+    document.addEventListener('DOMContentLoaded', function() {
+        const starLabels = document.querySelectorAll('.star-rating-label');
+
+        starLabels.forEach((label, index) => {
+            label.addEventListener('click', function() {
+                const rating = this.querySelector('input').value;
+
+                // Actualizar visual de todas las estrellas
+                starLabels.forEach((lbl, idx) => {
+                    const star = lbl.querySelector('i');
+                    if (idx < rating) {
+                        star.classList.remove('bi-star');
+                        star.classList.add('bi-star-fill');
+                        star.style.color = '#ffc107';
+                    } else {
+                        star.classList.remove('bi-star-fill');
+                        star.classList.add('bi-star');
+                        star.style.color = '#6c757d';
+                    }
+                });
+            });
+
+            // Efecto hover
+            label.addEventListener('mouseenter', function() {
+                const rating = this.querySelector('[data-rating]').dataset.rating;
+                starLabels.forEach((lbl, idx) => {
+                    const star = lbl.querySelector('i');
+                    if (idx < rating) {
+                        star.style.color = '#ffc107';
+                    }
+                });
+            });
+
+            label.addEventListener('mouseleave', function() {
+                const selectedInput = document.querySelector('input[name="nota"]:checked');
+                if (!selectedInput) {
+                    starLabels.forEach(lbl => {
+                        lbl.querySelector('i').style.color = '#6c757d';
+                    });
+                }
+            });
+        });
+    });
+</script>

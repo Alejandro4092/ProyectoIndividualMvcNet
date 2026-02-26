@@ -1,0 +1,280 @@
+﻿@model List<ProyectoIndividualMvcNet.Models.Juego>
+
+@{
+    ViewData["Title"] = "Mi Biblioteca de Juegos";
+}
+
+<!-- Hero Section -->
+<div class="bg-dark text-white py-5 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-collection-play me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                    Mi Biblioteca de Juegos
+                </h1>
+                <p class="lead mb-0">Todos tus juegos comprados en un solo lugar</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas rápidas -->
+<div class="container mb-4">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-controller fs-1 mb-2" style="color: var(--gaming-primary, #00ff88);"></i>
+                    <h3 class="text-white mb-0">@Model.Count</h3>
+                    <p class="text-muted mb-0">Juegos en tu biblioteca</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock-history fs-1 mb-2" style="color: var(--gaming-secondary, #0a84ff);"></i>
+                    <h3 class="text-white mb-0">∞</h3>
+                    <p class="text-muted mb-0">Horas de diversión</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark border-0 shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-trophy fs-1 mb-2" style="color: var(--gaming-accent, #ff006e);"></i>
+                    <h3 class="text-white mb-0">100%</h3>
+                    <p class="text-muted mb-0">Diversión garantizada</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de juegos comprados -->
+<div class="container mb-5">
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var juego in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 bg-dark border-0 shadow-lg game-card">
+                        <!-- Imagen del juego -->
+                        <div class="position-relative overflow-hidden" style="height: 250px;">
+                            @if (!string.IsNullOrEmpty(juego.Img))
+                            {
+                                <img src="@juego.Img" class="card-img-top h-100 w-100" alt="@juego.Titulo" style="object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-secondary d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-controller text-white" style="font-size: 4rem; opacity: 0.3;"></i>
+                                </div>
+                            }
+
+                            <!-- Badge de "En tu biblioteca" -->
+                            <div class="position-absolute top-0 start-0 m-2">
+                                <span class="badge px-3 py-2" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                                    <i class="bi bi-check-circle-fill me-1"></i>En tu biblioteca
+                                </span>
+                            </div>
+
+                            <!-- Overlay con acciones rápidas -->
+                            <div class="game-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="text-center">
+                                    <button class="btn btn-lg mb-2 shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold; width: 200px;">
+                                        <i class="bi bi-play-fill me-2"></i>Jugar Ahora
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-outline-light btn-lg" style="width: 200px;">
+                                        <i class="bi bi-download me-2"></i>Descargar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <!-- Título -->
+                            <h5 class="card-title text-white fw-bold mb-3" title="@juego.Titulo">
+                                @juego.Titulo
+                            </h5>
+
+                            <!-- Géneros y Plataforma -->
+                            <div class="mb-3">
+                                @if (!string.IsNullOrEmpty(juego.Genero))
+                                {
+                                    <span class="badge bg-primary me-1">
+                                        <i class="bi bi-tag-fill me-1"></i>@juego.Genero
+                                    </span>
+                                }
+                                @if (!string.IsNullOrEmpty(juego.Plataforma))
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-joystick me-1"></i>@juego.Plataforma
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Descripción corta -->
+                            @if (!string.IsNullOrEmpty(juego.Descripcion))
+                            {
+                                <p class="card-text text-muted small mb-3" style="height: 40px; overflow: hidden;">
+                                    @(juego.Descripcion.Length > 80 ? juego.Descripcion.Substring(0, 80) + "..." : juego.Descripcion)
+                                </p>
+                            }
+
+                            <!-- Botones de acción -->
+                            <div class="d-grid gap-2">
+                                <a asp-action="Details" asp-route-idjuego="@juego.Id" class="btn btn-outline-light btn-sm">
+                                    <i class="bi bi-info-circle me-2"></i>Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Footer de la card -->
+                        <div class="card-footer bg-transparent border-0 px-3 pb-3">
+                            <div class="d-flex justify-content-between align-items-center text-muted small">
+                                <span>
+                                    <i class="bi bi-calendar-check me-1"></i>Comprado
+                                </span>
+                                <span>
+                                    <i class="bi bi-clock me-1"></i>0h jugadas
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Mensaje cuando no hay juegos comprados -->
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card bg-dark border-0 shadow-lg text-center p-5">
+                    <div class="card-body">
+                        <i class="bi bi-inbox" style="font-size: 5rem; color: var(--gaming-primary, #00ff88); opacity: 0.5;"></i>
+                        <h3 class="text-white mt-4 mb-3">Tu biblioteca está vacía</h3>
+                        <p class="text-muted mb-4">
+                            Aún no has comprado ningún juego. ¡Explora nuestro catálogo y encuentra tu próxima aventura!
+                        </p>
+                        <a asp-controller="Juegos" asp-action="Index" class="btn btn-lg shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                            <i class="bi bi-shop me-2"></i>Explorar Tienda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Sección de recomendaciones (opcional) -->
+@if (Model != null && Model.Any())
+{
+    <div class="container mb-5">
+        <div class="card bg-dark border-0 shadow">
+            <div class="card-body p-4">
+                <h4 class="text-white mb-3">
+                    <i class="bi bi-stars me-2" style="color: var(--gaming-accent, #ff006e);"></i>
+                    ¿Sabías que...?
+                </h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-cloud-arrow-down fs-4 me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                            <div>
+                                <strong class="text-white">Descarga sin límites</strong>
+                                <p class="text-muted small mb-0">Descarga y juega offline cuando quieras</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-shield-check fs-4 me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                            <div>
+                                <strong class="text-white">Acceso permanente</strong>
+                                <p class="text-muted small mb-0">Tus juegos son tuyos para siempre</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-arrow-clockwise fs-4 me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                            <div>
+                                <strong class="text-white">Actualizaciones automáticas</strong>
+                                <p class="text-muted small mb-0">Mantén tus juegos siempre actualizados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-people fs-4 me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                            <div>
+                                <strong class="text-white">Juego en la nube</strong>
+                                <p class="text-muted small mb-0">Accede desde cualquier dispositivo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* Card de juego con efecto hover */
+    .game-card {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3) !important;
+        }
+
+    /* Overlay que aparece al hacer hover */
+    .game-overlay {
+        background: rgba(0, 0, 0, 0.85);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .game-card:hover .game-overlay {
+        opacity: 1;
+    }
+
+    /* Animación de botones */
+    .game-overlay button {
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    .game-card:hover .game-overlay button {
+        transform: translateY(0);
+    }
+
+    /* Variables CSS */
+    :root {
+        --gaming-primary: #00ff88;
+        --gaming-secondary: #0a84ff;
+        --gaming-accent: #ff006e;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .display-4 {
+            font-size: 2rem !important;
+        }
+
+        .game-overlay button {
+            width: 150px !important;
+            padding: 8px !important;
+            font-size: 0.9rem !important;
+        }
+    }
+</style>

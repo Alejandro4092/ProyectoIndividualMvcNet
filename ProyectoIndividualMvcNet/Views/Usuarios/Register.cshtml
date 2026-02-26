@@ -1,0 +1,239 @@
+﻿@{
+    ViewData["Title"] = "Registro de Usuario";
+    Layout = "_LayoutAuth";
+}
+
+<!-- Header -->
+<div class="container mb-4">
+    <div class="text-center">
+        <h1 class="display-4 fw-bold text-white mb-2">
+            <i class="bi bi-person-plus me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+            Crear Cuenta
+        </h1>
+        <p class="lead text-white-50">Únete a la comunidad gamer de GameStore</p>
+    </div>
+</div>
+
+<!-- Formulario de Registro -->
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card bg-dark border-0 shadow-lg">
+                <div class="card-header border-0 py-4" style="background: linear-gradient(90deg, var(--gaming-primary, #00ff88) 0%, transparent 100%);">
+                    <h4 class="mb-0 text-white">
+                        <i class="bi bi-controller me-2"></i>Información de Usuario
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Register" method="post">
+                        <!-- Nombre -->
+                        <div class="mb-4">
+                            <label for="nombre" class="form-label text-white fw-bold">
+                                <i class="bi bi-person me-2"></i>Nombre de Usuario
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   name="nombre"
+                                   id="nombre"
+                                   class="form-control form-control-lg bg-dark text-white border-secondary"
+                                   placeholder="Ej: GamerPro123"
+                                   required />
+                            <small class="text-white-50 d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>Este será tu nombre visible en la plataforma
+                            </small>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label text-white fw-bold">
+                                <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="email"
+                                   name="email"
+                                   id="email"
+                                   class="form-control form-control-lg bg-dark text-white border-secondary"
+                                   placeholder="ejemplo@correo.com"
+                                   required />
+                            <small class="text-white-50 d-block mt-2">
+                                <i class="bi bi-shield-lock me-1"></i>Tu email será usado para el inicio de sesión
+                            </small>
+                        </div>
+
+                        <!-- URL Imagen -->
+                        <div class="mb-4">
+                            <label for="imagen" class="form-label text-white fw-bold">
+                                <i class="bi bi-image me-2"></i>URL de Avatar
+                            </label>
+                            <input type="url"
+                                   name="imagen"
+                                   id="imagen"
+                                   class="form-control form-control-lg bg-dark text-white border-secondary"
+                                   placeholder="https://ejemplo.com/avatar.jpg" />
+                            <small class="text-white-50 d-block mt-2">
+                                <i class="bi bi-info-circle me-1"></i>Opcional: URL de tu imagen de perfil
+                            </small>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label text-white fw-bold">
+                                <i class="bi bi-key me-2"></i>Contraseña
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group input-group-lg">
+                                <input type="password"
+                                       name="password"
+                                       id="password"
+                                       class="form-control bg-dark text-white border-secondary"
+                                       placeholder="••••••••"
+                                       required />
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        id="togglePassword">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <small class="text-white-50 d-block mt-2">
+                                <i class="bi bi-shield-check me-1"></i>Mínimo 6 caracteres, se recomienda incluir números y símbolos
+                            </small>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="row mt-5">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <button type="submit" class="btn btn-lg w-100 shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                                    <i class="bi bi-check-circle me-2"></i>Crear Cuenta
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <a asp-action="Login" class="btn btn-outline-light btn-lg w-100">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Ya tengo cuenta
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Separador -->
+                        <div class="position-relative my-4">
+                            <hr class="border-secondary">
+                            <span class="position-absolute top-50 start-50 translate-middle bg-dark px-3 text-muted">
+                                o registrate con
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card bg-dark border-0 shadow mt-4">
+                <div class="card-body p-4">
+                    <h6 class="text-white mb-3">
+                        <i class="bi bi-gift me-2"></i>Beneficios de registrarte
+                    </h6>
+                    <div class="row g-3 text-light">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2 fs-5" style="color: var(--gaming-primary, #00ff88);"></i>
+                                <span>Acceso a ofertas exclusivas</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2 fs-5" style="color: var(--gaming-primary, #00ff88);"></i>
+                                <span>Seguimiento de pedidos</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2 fs-5" style="color: var(--gaming-primary, #00ff88);"></i>
+                                <span>Lista de deseos</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill me-2 fs-5" style="color: var(--gaming-primary, #00ff88);"></i>
+                                <span>Reseñas y valoraciones</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle mostrar/ocultar contraseña
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('bi-eye');
+                eyeIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('bi-eye-slash');
+                eyeIcon.classList.add('bi-eye');
+            }
+        });
+
+        // Validación del formulario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return false;
+            }
+        });
+    </script>
+}
+
+<style>
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #1a1a2e !important;
+        color: white !important;
+        border-color: var(--gaming-primary, #00ff88) !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 255, 136, 0.25) !important;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--gaming-primary, #00ff88);
+        border-color: var(--gaming-primary, #00ff88);
+    }
+
+    .form-check-input:focus {
+        border-color: var(--gaming-primary, #00ff88);
+        box-shadow: 0 0 0 0.25rem rgba(0, 255, 136, 0.25);
+    }
+
+    .btn-outline-light:hover {
+        background-color: var(--gaming-primary, #00ff88);
+        border-color: var(--gaming-primary, #00ff88);
+        color: #000;
+    }
+
+    /* Variables CSS fallback */
+    :root {
+        --gaming-primary: #00ff88;
+        --gaming-secondary: #0a84ff;
+        --gaming-accent: #ff006e;
+    }
+
+    /* Animación para el botón de submit */
+    button[type="submit"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4) !important;
+    }
+
+    /* Estilo para inputs en focus */
+    .input-group:focus-within {
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        border-radius: 0.375rem;
+    }
+</style>

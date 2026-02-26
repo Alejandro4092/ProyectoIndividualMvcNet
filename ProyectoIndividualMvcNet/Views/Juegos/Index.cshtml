@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ProyectoIndividualMvcNet.Models.Juego>
+﻿@using ProyectoIndividualMvcNet.Extensions
+@model IEnumerable<ProyectoIndividualMvcNet.Models.Juego>
 
 @{
     ViewData["Title"] = "Tienda de Juegos";
@@ -6,9 +7,14 @@
     var texto = ViewData["TEXTO"] as string ?? "";
     var genero = ViewData["GENERO"] as string ?? "";
     var plataforma = ViewData["PLATAFORMA"] as string ?? "";
+    
+    // Obtener el carrito de la sesión
+    var carrito = Context.Session.GetObject<List<ProyectoIndividualMvcNet.Models.Juego>>("CARRITO") 
+                  ?? new List<ProyectoIndividualMvcNet.Models.Juego>();
+    int cantidadCarrito = carrito.Count;
 }
 
-<!-- Hero Section -->
+<!-- Hero Section - SIN botón Mi Carrito -->
 <div class="bg-dark text-white py-5 mb-4">
     <div class="container">
         <div class="row align-items-center">
@@ -22,7 +28,7 @@
             {
                 <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                     <a asp-action="Create" class="btn btn-success btn-lg shadow">
-                        <i class="bi bi-plus-circle me-2"></i>Agregar Nuevo Juego
+                        <i class="bi bi-plus-circle me-2"></i>Agregar Juego
                     </a>
                 </div>
             }
@@ -80,10 +86,12 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             @foreach (var juego in Model)
             {
+                var estaEnCarrito = carrito.Any(j => j.Id == juego.Id);
+                
                 <div class="col">
-                    <div class="card h-100 shadow-sm hover-shadow transition">
+                    <div class="card h-100 bg-dark border-0 shadow-lg game-card">
                         <!-- Imagen del juego -->
-                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                        <div class="position-relative overflow-hidden" style="height: 250px;">
                             @if (!string.IsNullOrEmpty(juego.Img))
                             {
                                 <img src="@juego.Img" class="card-img-top object-fit-cover h-100" alt="@juego.Titulo">
@@ -94,7 +102,7 @@
                                     <i class="bi bi-controller text-white" style="font-size: 3rem;"></i>
                                 </div>
                             }
-                            
+
                             <!-- Badge de stock -->
                             @if (juego.Stock > 0)
                             {
@@ -108,11 +116,19 @@
                                     <i class="bi bi-x-circle me-1"></i>Agotado
                                 </span>
                             }
+                            
+                            <!-- Badge "En el carrito" -->
+                            @if (estaEnCarrito)
+                            {
+                                <span class="badge position-absolute top-0 start-0 m-2" style="background: var(--gaming-accent, #ff006e);">
+                                    <i class="bi bi-cart-check me-1"></i>En el carrito
+                                </span>
+                            }
                         </div>
 
                         <div class="card-body d-flex flex-column">
                             <!-- Título -->
-                            <h5 class="card-title fw-bold text-truncate mb-2" title="@juego.Titulo">
+                            <h5 class="card-title text-white fw-bold text-truncate mb-2" title="@juego.Titulo">
                                 @juego.Titulo
                             </h5>
 
@@ -137,33 +153,73 @@
                                 }
                             </div>
 
-                      
                             <div class="mt-auto">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 class="text-success fw-bold mb-0">@juego.Precio.ToString("C")</h4>
+                                <!-- Precio -->
+                                <div class="text-center mb-3">
+                                    <h3 class="fw-bold mb-0" style="color: var(--gaming-primary, #00ff88);">
+                                        @juego.Precio.ToString("C")
+                                    </h3>
                                     <small class="text-muted">
                                         <i class="bi bi-box-seam me-1"></i>Stock: @juego.Stock
                                     </small>
                                 </div>
 
-                              
-                                <div class="btn-group w-100" role="group">
-                                    <a asp-action="Details" asp-route-idjuego="@juego.Id" 
-                                       class="btn btn-outline-primary btn-sm" 
-                                       title="Ver detalles">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-idjuego="@juego.Id"
-                                       class="btn btn-outline-warning btn-sm" 
-                                       title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-idjuego="@juego.Id"
-                                       class="btn btn-outline-danger btn-sm" 
-                                       title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </div>
+                                @if (juego.Stock > 0)
+                                {
+                                    <!-- Botón de Compra Directa -->
+                                    <form asp-action="Comprar" method="post" class="mb-2">
+                                        <input type="hidden" name="idJuego" value="@juego.Id" />
+                                        <input type="hidden" name="precio" value="@juego.Precio" />
+                                        <button type="submit" class="btn btn-lg w-100 shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                                            <i class="bi bi-lightning-charge-fill me-2"></i>Comprar Ahora
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Botón Añadir al Carrito -->
+                                    @if (!estaEnCarrito)
+                                    {
+                                        <form asp-action="AgregarAlCarrito" method="post" class="mb-2">
+                                            <input type="hidden" name="idJuego" value="@juego.Id" />
+                                            <button type="submit" class="btn btn-outline-light w-100">
+                                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Carrito" asp-action="Index" class="btn w-100 mb-2" style="background: var(--gaming-accent, #ff006e); color: #fff;">
+                                            <i class="bi bi-cart-check me-2"></i>Ver en Carrito
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-lg w-100 mb-2" disabled>
+                                        <i class="bi bi-x-circle me-2"></i>No Disponible
+                                    </button>
+                                }
+
+                                <!-- Botón de Ver Detalles -->
+                                <a asp-action="Details" asp-route-idjuego="@juego.Id" class="btn btn-outline-light w-100 mb-2">
+                                    <i class="bi bi-eye me-2"></i>Ver Detalles
+                                </a>
+
+                                <!-- Botones de Administrador -->
+                                @if (isAdmin)
+                                {
+                                    <div class="btn-group w-100" role="group">
+                                        <a asp-action="Edit" asp-route-idjuego="@juego.Id"
+                                           class="btn btn-outline-warning btn-sm"
+                                           title="Editar">
+                                            <i class="bi bi-pencil me-1"></i>Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-idjuego="@juego.Id"
+                                           class="btn btn-outline-danger btn-sm"
+                                           title="Eliminar">
+                                            <i class="bi bi-trash me-1"></i>Eliminar
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -183,3 +239,94 @@
         </div>
     }
 </div>
+
+<!-- Notificaciones Toast -->
+@if (TempData["MENSAJE"] != null)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert">
+            <div class="toast-header" style="background: var(--gaming-primary, #00ff88); color: #000;">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong class="me-auto">¡Éxito!</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body bg-dark text-white">
+                @TempData["MENSAJE"]
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["INFO"] != null)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-info text-white">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong class="me-auto">Información</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body bg-dark text-white">
+                @TempData["INFO"]
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ERROR"] != null)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert">
+            <div class="toast-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong class="me-auto">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body bg-dark text-white">
+                @TempData["ERROR"]
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* Card de juego con efecto hover */
+    .game-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 255, 136, 0.2) !important;
+    }   
+
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3) !important;
+        border-color: var(--gaming-primary, #00ff88) !important;
+    }
+
+    /* Variables CSS */
+    :root {
+        --gaming-primary: #00ff88;
+        --gaming-secondary: #0a84ff;
+        --gaming-accent: #ff006e;
+    }
+
+    /* Animación del botón de compra */
+    .btn[style*="--gaming-primary"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5) !important;
+    }
+
+    /* Toast notification */
+    .toast {
+        border: 2px solid var(--gaming-primary, #00ff88);
+    }
+    
+    /* Badge del carrito animado */
+    .badge.rounded-pill {
+        animation: pulse-badge 2s infinite;
+    }
+    
+    @@keyframes pulse-badge {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+</style>

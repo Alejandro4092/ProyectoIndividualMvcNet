@@ -169,5 +169,105 @@ namespace ProyectoIndividualMvcNet.Repositories
 
             await this.context.Database.ExecuteSqlRawAsync(sql, pamId, pamTit, pamDesc, pamPre, pamStock, pamGen, pamPlat, pamImg, pamAct);
         }
+        public async Task ComprarJuegoAsync(int idUsuario, int idJuego, decimal precio)
+        {
+     
+            Juego juego = await this.context.Juegos.FirstOrDefaultAsync(x => x.Id == idJuego);
+
+            if (juego != null && juego.Stock > 0)
+            {
+                juego.Stock = juego.Stock - 1;
+                if (juego.Stock == 0)
+                {
+                    juego.Activo = false;
+                }
+                Pedido pedido = new Pedido
+                {
+                    UsuarioId = idUsuario,
+                    Fecha = DateTime.Now,
+                    Total = precio
+                };
+                this.context.Pedidos.Add(pedido);
+                await this.context.SaveChangesAsync();
+                PedidoDetalle detalle = new PedidoDetalle
+                {
+                    PedidoId = pedido.Id,
+                    JuegoId = idJuego,
+                    Cant = 1,
+                    Precio = precio
+                };
+                this.context.PedidoDetalle.Add(detalle);
+                await this.context.SaveChangesAsync();
+            }
+          
+        }
+
+        public async Task<List<Juego>> GetJuegosCompradosAsync(int idUsuario)
+        {
+            var consulta = from detalle in this.context.PedidoDetalle
+                           join pedido in this.context.Pedidos on detalle.PedidoId equals pedido.Id
+                           join juego in this.context.Juegos on detalle.JuegoId equals juego.Id
+                           where pedido.UsuarioId == idUsuario
+                           select juego;
+
+            return await consulta.ToListAsync();
+        }
+        public async Task ProcesarPedidoCarritoAsync(int idUsuario, List<Juego> carrito)
+        {
+            // 1. Calculamos el total de todos los juegos del carrito
+            decimal totalPedido = carrito.Sum(j => j.Precio);
+
+            // 2. Creamos la cabecera del Pedido
+            Pedido pedido = new Pedido
+            {
+                UsuarioId = idUsuario,
+                Fecha = DateTime.Now,
+                Total = totalPedido
+            };
+            this.context.Pedidos.Add(pedido);
+            await this.context.SaveChangesAsync(); // Para obtener el pedido.Id
+
+            // 3. Recorremos el carrito para crear los detalles y bajar stock
+            foreach (Juego item in carrito)
+            {
+                // Buscamos el juego real en DB para actualizar su stock
+                Juego dbJuego = await this.context.Juegos.FindAsync(item.Id);
+
+                if (dbJuego != null && dbJuego.Stock > 0)
+                {
+                    dbJuego.Stock -= 1;
+                    if (dbJuego.Stock == 0) dbJuego.Activo = false;
+
+                    PedidoDetalle detalle = new PedidoDetalle
+                    {
+                        PedidoId = pedido.Id,
+                        JuegoId = dbJuego.Id,
+                        Cant = 1,
+                        Precio = dbJuego.Precio
+                    };
+                    this.context.PedidoDetalle.Add(detalle);
+                }
+            }
+            await this.context.SaveChangesAsync();
+        }
+        public async Task<List<Resena>> GetResenasJuegoAsync(int idJuego)
+        {
+            return await this.context.Resenas
+                .Where(z => z.JuegoId == idJuego).OrderByDescending(z => z.Fecha).ToListAsync();
+        }
+        public async Task InsertarResenaAsync(int idUsuario, int idJuego, int nota, string comentario)
+        {
+            Resena resena = new Resena
+            {
+                UsuarioId = idUsuario,
+                JuegoId = idJuego,
+                Nota = nota,
+                Comentario = comentario,
+                Fecha = DateTime.Now
+            };
+
+            this.context.Resenas.Add(resena);
+            await this.context.SaveChangesAsync();
+        }
     }
 }
