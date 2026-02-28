@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using ProyectoIndividualMvcNet.Data;
 using ProyectoIndividualMvcNet.Helpers;
@@ -76,5 +77,57 @@ namespace ProyectoIndividualMvcNet.Repositories
             }
             return null;
         }
+        // Busca un usuario por su ID para cargar el perfil
+        public async Task<Usuario> FindUsuarioAsync(int idUsuario)
+        {
+            return await this.context.Usuarios
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+        }
+
+        // Actualiza los datos del usuario en la base de datos
+        public async Task UpdatePerfilSinPasswordAsync(int idUsuario, string nombre, string email, string imagen)
+        {
+            // Buscamos al usuario real en la base de datos
+            Usuario user = await this.context.Usuarios
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+
+            if (user != null)
+            {
+                // Actualizamos solo los campos permitidos
+                user.Nombre = nombre;
+                user.Email = email;
+                user.Imagen = imagen;
+
+                // La contraseña (user.Password) ni se toca, se queda la que estaba
+                await this.context.SaveChangesAsync();
+            }
+        }
+        // Obtener todos los usuarios de la base de datos
+        public async Task<List<Usuario>> GetUsuariosAsync()
+        {
+            return await this.context.Usuarios.ToListAsync();
+        }
+
+        // Eliminar un usuario por su ID
+        public async Task DeleteUsuarioAsync(int idUsuario)
+        {
+            Usuario user = await this.context.Usuarios
+                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+
+            if (user != null)
+            {
+
+                var userSecurity = await this.context.UsuariosSecurity
+                    .FirstOrDefaultAsync(s => s.IdUsuario == idUsuario);
+                
+                if (userSecurity != null)
+                {
+                    this.context.UsuariosSecurity.Remove(userSecurity);
+                }
+                this.context.Usuarios.Remove(user);
+                await this.context.SaveChangesAsync();
+            }
+        }
+
     }
 }
