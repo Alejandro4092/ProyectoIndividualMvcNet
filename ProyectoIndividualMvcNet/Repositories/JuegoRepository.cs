@@ -269,5 +269,22 @@ namespace ProyectoIndividualMvcNet.Repositories
             this.context.Resenas.Add(resena);
             await this.context.SaveChangesAsync();
         }
+
+        public async Task<List<Juego>> GetJuegosMasVendidosAsync()
+        {
+            return await this.context.Juegos
+                .Include(j => j.PedidoDetalles)
+                .OrderByDescending(j => j.PedidoDetalles.Count) 
+                .Take(5) // Top 5
+                .ToListAsync();
+        }
+        public async Task<List<Resena>> GetAllResenasAsync()
+        {
+            return await this.context.Resenas
+                .OrderByDescending(r => r.Fecha)
+                .ToListAsync();
+        }
+       
+
     }
 }

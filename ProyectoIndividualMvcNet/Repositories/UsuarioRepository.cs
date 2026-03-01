@@ -128,6 +128,21 @@ namespace ProyectoIndividualMvcNet.Repositories
                 await this.context.SaveChangesAsync();
             }
         }
+        public async Task<List<Resena>> GetTodasResenasAsync()
+        {
+            return await this.context.Resenas
+                .OrderByDescending(r => r.Fecha)
+                .ToListAsync();
+        }
+        public async Task DeleteResenaAsync(int idResena)
+        {
+            Resena resena = await this.context.Resenas.FindAsync(idResena);
+            if (resena != null)
+            {
+                this.context.Resenas.Remove(resena);
+                await this.context.SaveChangesAsync();
+            }
+        }
 
     }
 }

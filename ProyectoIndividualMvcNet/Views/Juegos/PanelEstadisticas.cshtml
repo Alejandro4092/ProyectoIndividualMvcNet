@@ -1,0 +1,242 @@
+﻿@model List<Resena>
+
+@{
+    ViewData["Title"] = "Panel de Estadísticas";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/panel-estadisticas.css" asp-append-version="true" />
+}
+
+<!-- Breadcrumb -->
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index" class="text-decoration-none text-white">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+            </li>
+            <li class="breadcrumb-item active" style="color: var(--gaming-primary);" aria-current="page">
+                Panel de Estadísticas
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Header -->
+<div class="container mb-5">
+    <div class="text-center">
+        <h1 class="display-4 fw-bold text-white mb-2">
+            <i class="bi bi-bar-chart-fill me-3" style="color: var(--gaming-primary);"></i>
+            Panel de Estadísticas
+        </h1>
+        <p class="lead text-white-50">Análisis de ventas y métricas del negocio</p>
+    </div>
+</div>
+
+<!-- Contenido Principal -->
+<div class="container mb-5">
+    <!-- Estadísticas Rápidas -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card stats-card-small bg-gradient-primary">
+                <div class="card-body text-center">
+                    <i class="bi bi-cart-check" style="font-size: 3rem; color: var(--gaming-primary);"></i>
+                    <h3 class="mt-3 mb-1 text-white">
+                        @(ViewBag.TopVentas != null ? ((List<Juego>)ViewBag.TopVentas).Sum(j => j.PedidoDetalles.Count) : 0)
+                    </h3>
+                    <p class="text-white-50 mb-0">Total Ventas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card-small bg-gradient-secondary">
+                <div class="card-body text-center">
+                    <i class="bi bi-currency-euro" style="font-size: 3rem; color: var(--gaming-secondary);"></i>
+                    <h3 class="mt-3 mb-1 text-white">
+                        @(ViewBag.TopVentas != null ? ((List<Juego>)ViewBag.TopVentas).Sum(j => j.Precio * j.PedidoDetalles.Count).ToString("C") : "0€")
+                    </h3>
+                    <p class="text-white-50 mb-0">Ingresos Totales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card-small bg-gradient-accent">
+                <div class="card-body text-center">
+                    <i class="bi bi-controller" style="font-size: 3rem; color: var(--gaming-accent);"></i>
+                    <h3 class="mt-3 mb-1 text-white">
+                        @(ViewBag.TopVentas != null ? ((List<Juego>)ViewBag.TopVentas).Count : 0)
+                    </h3>
+                    <p class="text-white-50 mb-0">Juegos en Top 5</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Ventas Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card stats-card card-ventas">
+                <div class="card-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-trophy-fill me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <h4 class="mb-0">Top 5 Videojuegos Más Vendidos</h4>
+                                <small class="text-white-50">Los títulos más populares de la tienda</small>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-light" onclick="window.print()">
+                                <i class="bi bi-printer me-2"></i>Imprimir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.TopVentas != null && ((List<Juego>)ViewBag.TopVentas).Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover stats-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <i class="bi bi-hash me-2"></i>Pos
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-controller me-2"></i>Juego
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-currency-euro me-2"></i>Precio
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-graph-up me-2"></i>Ventas Totales
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-cash-stack me-2"></i>Ingresos
+                                        </th>
+                                        <th>
+                                            <i class="bi bi-box-seam me-2"></i>Stock Actual
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int posicion = 1;
+                                    }
+                                    @foreach (Juego j in ViewBag.TopVentas)
+                                    {
+                                        <tr class="stats-row">
+                                            <td>
+                                                <span class="position-badge position-@posicion">
+                                                    @posicion
+                                                </span>
+                                            </td>
+                                            <td class="fw-bold game-title">
+                                                @j.Titulo
+                                            </td>
+                                            <td class="precio-cell">
+                                                @j.Precio.ToString("F2") €
+                                            </td>
+                                            <td>
+                                                <span class="ventas-badge">
+                                                    <i class="bi bi-cart-check me-1"></i>
+                                                    @j.PedidoDetalles.Count unidades
+                                                </span>
+                                            </td>
+                                            <td class="ingresos-cell">
+                                                <strong>@((j.Precio * j.PedidoDetalles.Count).ToString("C"))</strong>
+                                            </td>
+                                            <td>
+                                                <span class="stock-indicator @(j.Stock < 10 ? "stock-bajo" : j.Stock < 20 ? "stock-medio" : "stock-alto")">
+                                                    <i class="bi bi-box me-1"></i>
+                                                    @j.Stock
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        posicion++;
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr style="border-top: 3px solid var(--gaming-primary);">
+                                        <td colspan="3" class="text-end fw-bold text-white">
+                                            <i class="bi bi-calculator me-2"></i>TOTALES:
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success fs-6 px-3 py-2">
+                                                @((ViewBag.TopVentas as List<Juego>).Sum(j => j.PedidoDetalles.Count)) unidades
+                                            </span>
+                                        </td>
+                                        <td class="fw-bold" style="color: var(--gaming-primary); font-size: 1.2rem;">
+                                            @((ViewBag.TopVentas as List<Juego>).Sum(j => j.Precio * j.PedidoDetalles.Count).ToString("C"))
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center" role="alert">
+                            <i class="bi bi-info-circle-fill me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>Sin datos</strong> No hay ventas registradas en este momento.
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos adicionales (placeholder para futuras mejoras) -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card stats-card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--gaming-secondary) 0%, var(--gaming-primary) 100%); color: white; border-bottom: 3px solid var(--gaming-secondary);">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pie-chart me-2"></i>Distribución por Género
+                    </h5>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-pie-chart" style="font-size: 4rem; color: var(--gaming-secondary); opacity: 0.3;"></i>
+                    <p class="text-muted mt-3">Próximamente: Gráfico de distribución</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card stats-card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--gaming-accent) 0%, #ff6b9d 100%); color: white; border-bottom: 3px solid var(--gaming-accent);">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Tendencia de Ventas
+                    </h5>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-graph-up-arrow" style="font-size: 4rem; color: var(--gaming-accent); opacity: 0.3;"></i>
+                    <p class="text-muted mt-3">Próximamente: Gráfico de tendencias</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilo adicional para ingresos */
+    .ingresos-cell {
+        color: var(--gaming-primary);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.1rem;
+    }
+
+    /* Estilo para el footer de la tabla */
+    .stats-table tfoot tr {
+        background: rgba(0, 255, 136, 0.05);
+    }
+
+    .stats-table tfoot td {
+        padding: 20px;
+        font-size: 1rem;
+    }
+</style>

@@ -2,7 +2,6 @@
 using ProyectoIndividualMvcNet.Models;
 using ProyectoIndividualMvcNet.Repositories;
 using ProyectoIndividualMvcNet.Extensions;
-using Microsoft.AspNetCore.Http;
 
 namespace ProyectoIndividualMvcNet.Controllers
 {
@@ -14,7 +13,6 @@ namespace ProyectoIndividualMvcNet.Controllers
         {
             this.repo = repo;
         }
-
 
         public async Task<IActionResult> Perfil()
         {
@@ -38,13 +36,14 @@ namespace ProyectoIndividualMvcNet.Controllers
                 user.Email,
                 user.Imagen
             );
+
             Usuario usuarioActualizado = await this.repo.FindUsuarioAsync(user.IdUsuario);
+
             HttpContext.Session.SetObject("USUARIO", usuarioActualizado);
             HttpContext.Session.SetString("NOMBRE", usuarioActualizado.Nombre);
             HttpContext.Session.SetString("IMAGEN", usuarioActualizado.Imagen);
 
             ViewData["MENSAJE"] = "¡Perfil actualizado correctamente!";
-
             return View(usuarioActualizado);
         }
 
@@ -54,8 +53,7 @@ namespace ProyectoIndividualMvcNet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register
-            (string nombre, string email, string imagen, string password)
+        public async Task<IActionResult> Register(string nombre, string email, string imagen, string password)
         {
             await this.repo.RegisterUserAsync(nombre, email, imagen, password);
             return RedirectToAction("Login");
@@ -80,7 +78,6 @@ namespace ProyectoIndividualMvcNet.Controllers
                 HttpContext.Session.SetObject("USUARIO", user);
                 HttpContext.Session.SetString("NOMBRE", user.Nombre);
                 HttpContext.Session.SetString("IMAGEN", user.Imagen);
-
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -93,31 +90,36 @@ namespace ProyectoIndividualMvcNet.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-
-            return RedirectToAction("Login", "Usuarios");
+            return RedirectToAction("Login");
         }
-        // GET: /Usuarios/AdminUsuarios
         public async Task<IActionResult> AdminUsuarios()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
+
             if (user == null || user.RolId != 1)
             {
-                TempData["ERROR"] = "Acceso denegado. Se requieren permisos de administrador.";
-                return RedirectToAction("Index", "Juegos");
-            }
-            List<Usuario> usuarios = await this.repo.GetUsuariosAsync();
-            return View(usuarios);
-        }
-        public async Task<IActionResult> DeleteUsuario(int idUsuario)
-        {
-            Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
-            if (user == null || user.RolId != 1)
-            {
-                return RedirectToAction("Login");
+                return RedirectToAction("Index", "Home");
             }
 
+            List<Usuario> usuarios = await this.repo.GetUsuariosAsync();
+            ViewBag.Resenas = await this.repo.GetTodasResenasAsync();
+
+            return View(usuarios);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteResena(int idResena)
+        {
+            await this.repo.DeleteResenaAsync(idResena);
+            TempData["Mensaje"] = "Reseña eliminada correctamente.";
+            return RedirectToAction("AdminUsuarios");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUsuario(int idUsuario)
+        {
             await this.repo.DeleteUsuarioAsync(idUsuario);
-            TempData["MENSAJE"] = "Usuario eliminado con éxito.";
+            TempData["Mensaje"] = "Usuario eliminado correctamente.";
             return RedirectToAction("AdminUsuarios");
         }
     }

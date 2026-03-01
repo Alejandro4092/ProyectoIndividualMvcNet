@@ -1,0 +1,461 @@
+﻿/* ===================================
+   PANEL DE ESTADÍSTICAS - ESTILOS
+   =================================== */
+
+/* Variables ya definidas en Layout */
+:root {
+    --gaming-primary: #00ff88;
+    --gaming-secondary: #0a84ff;
+    --gaming-accent: #ff006e;
+    --gaming-dark: #0d1117;
+    --gaming-darker: #010409;
+    --gaming-gray: #161b22;
+}
+
+/* Cards Principales */
+.stats-card {
+    background: rgba(13, 17, 23, 0.95);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+    .stats-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+    }
+
+/* Card Headers */
+.card-ventas .card-header {
+    background: linear-gradient(135deg, var(--gaming-primary) 0%, var(--gaming-secondary) 100%);
+    color: white;
+    border-bottom: 3px solid var(--gaming-primary);
+    padding: 25px 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-moderacion .card-header {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: #000;
+    border-bottom: 3px solid #ffca2c;
+    padding: 25px 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+}
+
+.stats-card:hover .card-header::before {
+    left: 100%;
+}
+
+.card-header h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Card Body */
+.stats-card .card-body {
+    padding: 30px;
+    background: linear-gradient(180deg, rgba(13, 17, 23, 0.98) 0%, rgba(1, 4, 9, 1) 100%);
+}
+
+/* Tablas */
+.stats-table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    .stats-table thead th {
+        background: rgba(0, 0, 0, 0.5);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+        padding: 18px 20px;
+        border-bottom: 2px solid var(--gaming-primary);
+        color: var(--gaming-primary);
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .stats-table tbody .stats-row {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+        .stats-table tbody .stats-row:hover {
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.1) 0%, transparent 100%);
+            transform: scale(1.01);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.15);
+        }
+
+    .stats-table tbody td {
+        padding: 16px 20px;
+        vertical-align: middle;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+/* Position Badge */
+.position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-weight: 900;
+    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.position-1 {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+}
+
+.position-2 {
+    background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%);
+    color: #000;
+    box-shadow: 0 5px 15px rgba(192, 192, 192, 0.5);
+}
+
+.position-3 {
+    background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(205, 127, 50, 0.5);
+}
+
+.position-4, .position-5 {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Game Title */
+.game-title {
+    color: var(--gaming-primary) !important;
+    font-size: 1.05rem;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Precio */
+.precio-cell {
+    font-weight: 700;
+    color: var(--gaming-secondary);
+    font-size: 1.1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Ventas Badge */
+.ventas-badge {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+    color: white;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    font-weight: 700;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.4);
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+/* Stock Indicator */
+.stock-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.stock-alto {
+    background: rgba(25, 135, 84, 0.2);
+    color: #20c997;
+    border: 2px solid #20c997;
+}
+
+.stock-medio {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 2px solid #ffc107;
+}
+
+.stock-bajo {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    animation: pulse 2s infinite;
+}
+
+/* User & Game Badges */
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.game-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(10, 132, 255, 0.2);
+    color: var(--gaming-secondary);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(10, 132, 255, 0.3);
+}
+
+/* Nota Badge */
+.nota-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.nota-1, .nota-2 {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 2px solid #dc3545;
+}
+
+.nota-3 {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 2px solid #ffc107;
+}
+
+.nota-4, .nota-5 {
+    background: rgba(25, 135, 84, 0.2);
+    color: #20c997;
+    border: 2px solid #20c997;
+}
+
+/* Comentario */
+.comentario-cell {
+    max-width: 400px;
+}
+
+.comentario-text {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+}
+
+/* Botón Eliminar */
+.btn-eliminar {
+    background: linear-gradient(135deg, var(--gaming-accent) 0%, #c82333 100%);
+    color: white;
+    border: 2px solid var(--gaming-accent);
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 0, 110, 0.3);
+}
+
+    .btn-eliminar:hover {
+        transform: scale(1.1) translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 0, 110, 0.5);
+        background: linear-gradient(135deg, #c82333 0%, var(--gaming-accent) 100%);
+        color: white;
+    }
+
+    .btn-eliminar:active {
+        transform: scale(0.98);
+    }
+
+/* Cards Pequeñas de Estadísticas */
+.stats-card-small {
+    background: rgba(13, 17, 23, 0.95);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+    .stats-card-small:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, transparent 100%);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, rgba(10, 132, 255, 0.1) 0%, transparent 100%);
+    border: 1px solid rgba(10, 132, 255, 0.2);
+}
+
+.bg-gradient-accent {
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.1) 0%, transparent 100%);
+    border: 1px solid rgba(255, 0, 110, 0.2);
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Alerts Personalizados */
+.alert {
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Scrollbar para tablas */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, var(--gaming-primary), var(--gaming-secondary));
+    border-radius: 10px;
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 992px) {
+    .stats-card .card-body {
+        padding: 20px;
+    }
+
+    .card-header {
+        padding: 20px 20px !important;
+    }
+
+        .card-header h4 {
+            font-size: 1.2rem;
+        }
+}
+
+@media (max-width: 768px) {
+    .stats-table {
+        font-size: 0.85rem;
+    }
+
+        .stats-table thead th,
+        .stats-table tbody td {
+            padding: 12px 10px;
+        }
+
+    .comentario-cell {
+        max-width: 200px;
+    }
+
+    .btn-eliminar {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+
+    .position-badge {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-card .card-body {
+        padding: 15px;
+    }
+
+    .card-header {
+        padding: 15px !important;
+    }
+
+        .card-header h4 {
+            font-size: 1rem;
+        }
+
+        .card-header small {
+            font-size: 0.75rem;
+        }
+
+    .stats-table thead th {
+        font-size: 0.7rem;
+        padding: 10px 8px;
+    }
+
+    .stats-table tbody td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+
+    .comentario-cell {
+        max-width: 120px;
+    }
+
+    .ventas-badge,
+    .stock-indicator,
+    .nota-badge {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+}
