@@ -143,7 +143,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> PanelVentas()
+        public async Task<IActionResult> PanelEstadisticas()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
 

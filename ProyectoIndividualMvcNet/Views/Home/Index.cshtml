@@ -1,8 +1,253 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio - GameStore";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100 py-5">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Bienvenido a
+                        <span class="gradient-text">GAMESTORE</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Tu destino definitivo para los mejores videojuegos.
+                        Descubre, compra y juega a los títulos más increíbles.
+                    </p>
+                    <div class="hero-buttons">
+                        <a asp-controller="Juegos" asp-action="Index" class="btn btn-hero-primary">
+                            <i class="bi bi-controller me-2"></i>Explorar Juegos
+                        </a>
+                        <a asp-controller="Usuarios" asp-action="Register" class="btn btn-hero-secondary">
+                            <i class="bi bi-person-plus me-2"></i>Registrarse
+                        </a>
+                    </div>
+                    <div class="hero-stats mt-5">
+                        <div class="row g-4">
+                            <div class="col-4">
+                                <div class="stat-card">
+                                    <h3 class="stat-number">500+</h3>
+                                    <p class="stat-label">Juegos</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-card">
+                                    <h3 class="stat-number">10K+</h3>
+                                    <p class="stat-label">Usuarios</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-card">
+                                    <h3 class="stat-number">24/7</h3>
+                                    <p class="stat-label">Soporte</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <div class="floating-card card-1">
+                        <i class="bi bi-controller"></i>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="bi bi-trophy-fill"></i>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="bi bi-joystick"></i>
+                    </div>
+                    <div class="hero-circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">¿Por qué elegir GameStore?</h2>
+            <p class="section-subtitle">La mejor experiencia de compra para gamers</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <h4 class="feature-title">Entrega Instantánea</h4>
+                    <p class="feature-description">Recibe tus juegos al instante después de la compra</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h4 class="feature-title">100% Seguro</h4>
+                    <p class="feature-description">Transacciones protegidas y datos encriptados</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-tag-fill"></i>
+                    </div>
+                    <h4 class="feature-title">Mejores Precios</h4>
+                    <p class="feature-description">Ofertas exclusivas y descuentos increíbles</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h4 class="feature-title">Soporte 24/7</h4>
+                    <p class="feature-description">Asistencia disponible en todo momento</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Explora por Categorías</h2>
+            <p class="section-subtitle">Encuentra tu género favorito</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="Acción" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-crosshair"></i>
+                    </div>
+                    <h3 class="category-name">Acción</h3>
+                    <p class="category-count">150+ Juegos</p>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="Aventura" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-compass"></i>
+                    </div>
+                    <h3 class="category-name">Aventura</h3>
+                    <p class="category-count">120+ Juegos</p>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="RPG" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-gem"></i>
+                    </div>
+                    <h3 class="category-name">RPG</h3>
+                    <p class="category-count">100+ Juegos</p>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="Deportes" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h3 class="category-name">Deportes</h3>
+                    <p class="category-count">80+ Juegos</p>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="Estrategia" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h3 class="category-name">Estrategia</h3>
+                    <p class="category-count">90+ Juegos</p>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Juegos" asp-action="Index" asp-route-genero="Simulación" class="category-card">
+                    <div class="category-overlay"></div>
+                    <div class="category-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h3 class="category-name">Simulación</h3>
+                    <p class="category-count">70+ Juegos</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Platforms Section -->
+<section class="platforms-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Todas las Plataformas</h2>
+            <p class="section-subtitle">Juega donde quieras, cuando quieras</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="platform-card">
+                    <i class="bi bi-playstation"></i>
+                    <p>PlayStation</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="platform-card">
+                    <i class="bi bi-xbox"></i>
+                    <p>Xbox</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="platform-card">
+                    <i class="bi bi-nintendo-switch"></i>
+                    <p>Switch</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="platform-card">
+                    <i class="bi bi-pc-display"></i>
+                    <p>PC</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                <div class="platform-card">
+                    <i class="bi bi-phone"></i>
+                    <p>Mobile</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-5">
+    <div class="container">
+        <div class="cta-card">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title">¿Listo para comenzar tu aventura?</h2>
+                    <p class="cta-description">Únete a miles de gamers y accede a los mejores juegos del mercado</p>
+                </div>
+                <div class="col-lg-4 text-lg-end text-center mt-4 mt-lg-0">
+                    <a asp-controller="Juegos" asp-action="Index" class="btn btn-cta">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Empezar Ahora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
