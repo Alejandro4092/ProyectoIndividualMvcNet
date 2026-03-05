@@ -89,8 +89,32 @@
                         </div>
                         @if (Model.Stock > 0)
                         {
-                            <form asp-action="AgregarAlCarrito" method="post">
+                            <form asp-action="AgregarAlCarrito" method="post" class="d-flex align-items-center gap-3">
                                 <input type="hidden" name="idJuego" value="@Model.Id" />
+                                
+                                <!-- Input de cantidad -->
+                                <div class="quantity-selector">
+                                    <label for="cantidad" class="form-label text-white mb-1 small">Cantidad:</label>
+                                    <div class="input-group" style="width: 120px;">
+                                        <button type="button" class="btn btn-outline-light btn-sm" onclick="decrementQuantity()">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" 
+                                               id="cantidad" 
+                                               name="cantidad" 
+                                               class="form-control form-control-sm text-center bg-dark text-white" 
+                                               value="1" 
+                                               min="1" 
+                                               max="@Model.Stock" 
+                                               style="border-left: none; border-right: none;" />
+                                        <button type="button" class="btn btn-outline-light btn-sm" onclick="incrementQuantity(@Model.Stock)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Stock: @Model.Stock</small>
+                                </div>
+
+                                <!-- Botón agregar -->
                                 <button type="submit" class="btn btn-gaming btn-lg shadow-lg">
                                     <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
                                 </button>
@@ -514,51 +538,77 @@
     .toast {
         border: 2px solid var(--gaming-primary);
     }
+
+    /* Selector de cantidad */
+    .quantity-selector {
+        text-align: center;
+    }
+
+    .quantity-selector .input-group {
+        box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .quantity-selector .btn {
+        border-color: var(--gaming-primary);
+        color: var(--gaming-primary);
+    }
+
+    .quantity-selector .btn:hover {
+        background-color: var(--gaming-primary);
+        color: #000;
+    }
+
+    .quantity-selector input[type="number"] {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Ocultar las flechas del input number (opcional) */
+    .quantity-selector input[type="number"]::-webkit-inner-spin-button,
+    .quantity-selector input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .quantity-selector input[type="number"] {
+        -moz-appearance: textfield;
+    }
 </style>
 
-<script>
-    // Sistema de calificación con estrellas
-    document.addEventListener('DOMContentLoaded', function() {
-        const starLabels = document.querySelectorAll('.star-rating-label');
+@section Scripts {
+    <!-- Scripts existentes -->
+    
+    <script>
+        // Función para incrementar cantidad
+        function incrementQuantity(maxStock) {
+            const input = document.getElementById('cantidad');
+            let value = parseInt(input.value) || 1;
+            if (value < maxStock) {
+                input.value = value + 1;
+            }
+        }
 
-        starLabels.forEach((label, index) => {
-            label.addEventListener('click', function() {
-                const rating = this.querySelector('input').value;
+        // Función para decrementar cantidad
+        function decrementQuantity() {
+            const input = document.getElementById('cantidad');
+            let value = parseInt(input.value) || 1;
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        }
 
-                // Actualizar visual de todas las estrellas
-                starLabels.forEach((lbl, idx) => {
-                    const star = lbl.querySelector('i');
-                    if (idx < rating) {
-                        star.classList.remove('bi-star');
-                        star.classList.add('bi-star-fill');
-                        star.style.color = '#ffc107';
-                    } else {
-                        star.classList.remove('bi-star-fill');
-                        star.classList.add('bi-star');
-                        star.style.color = '#6c757d';
-                    }
-                });
-            });
-
-            // Efecto hover
-            label.addEventListener('mouseenter', function() {
-                const rating = this.querySelector('[data-rating]').dataset.rating;
-                starLabels.forEach((lbl, idx) => {
-                    const star = lbl.querySelector('i');
-                    if (idx < rating) {
-                        star.style.color = '#ffc107';
-                    }
-                });
-            });
-
-            label.addEventListener('mouseleave', function() {
-                const selectedInput = document.querySelector('input[name="nota"]:checked');
-                if (!selectedInput) {
-                    starLabels.forEach(lbl => {
-                        lbl.querySelector('i').style.color = '#6c757d';
-                    });
-                }
-            });
+        // Validar que no se exceda el stock al escribir manualmente
+        document.getElementById('cantidad')?.addEventListener('input', function() {
+            const maxStock = parseInt(this.max);
+            let value = parseInt(this.value);
+            
+            if (value < 1) {
+                this.value = 1;
+            } else if (value > maxStock) {
+                this.value = maxStock;
+            }
         });
-    });
-</script>
+    </script>
+}

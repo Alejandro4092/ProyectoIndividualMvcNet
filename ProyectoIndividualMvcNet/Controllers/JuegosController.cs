@@ -112,37 +112,54 @@ namespace ProyectoIndividualMvcNet.Controllers
         public async Task<IActionResult> MisCompras()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
-
             if (user == null)
             {
                 return RedirectToAction("Login", "Usuarios");
             }
-
+            
             var misJuegos = await this.repo.GetJuegosCompradosAsync(user.IdUsuario);
-            return View(misJuegos);
+            return View(misJuegos); // Returns List<CompraRealizada>
         }
 
         [HttpPost]
-        public async Task<IActionResult> AgregarAlCarrito(int idJuego)
+        public IActionResult AgregarAlCarrito(int idJuego, int cantidad = 1)
         {
-            Juego juego = await this.repo.FindJuegoAsync(idJuego);
+            // Validar cantidad
+            if (cantidad < 1) cantidad = 1;
 
-            if (juego == null || juego.Stock <= 0)
-            {
-                return RedirectToAction("Index");
-            }
-
+            // Obtener carrito de sesión
             List<Juego> carrito = HttpContext.Session.GetObject<List<Juego>>("CARRITO") ?? new List<Juego>();
-
-            if (carrito.Any(j => j.Id == idJuego) == false)
+            
+            // Buscar el juego
+            Juego juego = this.repo.FindJuegoAsync(idJuego).Result;
+            
+            if (juego != null)
             {
-                carrito.Add(juego);
+                // Verificar stock
+                int cantidadEnCarrito = carrito.Count(j => j.Id == idJuego);
+                if (cantidadEnCarrito + cantidad > juego.Stock)
+                {
+                    TempData["ERROR"] = $"No hay suficiente stock de '{juego.Titulo}'. Disponible: {juego.Stock}, ya tienes en carrito: {cantidadEnCarrito}";
+                    return RedirectToAction("Index"); // Volver al catálogo
+                }
+
+                // Añadir las copias al carrito
+                for (int i = 0; i < cantidad; i++)
+                {
+                    carrito.Add(juego);
+                }
+
                 HttpContext.Session.SetObject("CARRITO", carrito);
+                TempData["MENSAJE"] = $"✓ Se añadieron {cantidad} unidad(es) de '{juego.Titulo}' al carrito";
+            }
+            else
+            {
+                TempData["ERROR"] = "Juego no encontrado";
             }
 
+            // CAMBIO CLAVE: Redirigir a Index en lugar de Details
             return RedirectToAction("Index");
         }
-
         public async Task<IActionResult> PanelEstadisticas()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");

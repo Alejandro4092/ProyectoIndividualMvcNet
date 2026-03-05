@@ -18,77 +18,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
-    #region procedures
-    //    CREATE OR ALTER PROCEDURE sp_BuscarJuegos
-    //    @Texto VARCHAR(100) = '', -- Valor por defecto vacío
-    //    @Genero VARCHAR(50) = '',
-    //    @Plataforma VARCHAR(50) = ''
-    //AS
-    //BEGIN
-    //    SELECT* FROM Juegos
-    //    WHERE
-    //        (Titulo LIKE '%' + @Texto + '%')
-    //        AND(@Genero = '' OR Genero = @Genero)
-    //        AND(@Plataforma = '' OR Plataforma LIKE '%' + @Plataforma + '%')
-    //        AND Activo = 1
-    //    ORDER BY Titulo;
-    //END
-    //    USE TiendaJuegos;
-    //    GO
-
-    //-- PROCEDURE PARA CREAR(INSERTAR)
-    //CREATE OR ALTER PROCEDURE sp_InsertarJuego
-    //    @Titulo VARCHAR(100),
-    //    @Descripcion VARCHAR(MAX),
-    //    @Precio DECIMAL(18,2),
-    //    @Stock INT,
-    //    @Genero VARCHAR(50),
-    //    @Plataforma VARCHAR(50),
-    //    @Img VARCHAR(MAX),
-    //    @Activo BIT
-    //AS
-    //BEGIN
-    //    DECLARE @NuevoId INT;
-    //    SELECT @NuevoId = ISNULL(MAX(Id), 0) + 1 FROM Juegos;
-
-    //    INSERT INTO Juegos(Id, Titulo, Descripcion, Precio, Stock, Genero, Plataforma, Img, Activo)
-    //    VALUES(@NuevoId, @Titulo, @Descripcion, @Precio, @Stock, @Genero, @Plataforma, @Img, @Activo);
-    //    END
-    //    GO
-
-    //-- PROCEDURE PARA BORRAR(DELETE)
-    //CREATE OR ALTER PROCEDURE sp_EliminarJuego
-    //    @Id INT
-    //AS
-    //BEGIN
-    //    DELETE FROM Juegos WHERE Id = @Id;
-    //    END
-    //    GO
-//    CREATE OR ALTER PROCEDURE sp_EditarJuego
-//        @Id INT,
-//    @Titulo VARCHAR(100),
-//    @Descripcion VARCHAR(MAX),
-//    @Precio DECIMAL(18,2),
-//    @Stock INT,
-//    @Genero VARCHAR(50),
-//    @Plataforma VARCHAR(50),
-//    @Img VARCHAR(MAX),
-//    @Activo BIT
-//AS
-//BEGIN
-//    UPDATE Juegos
-//    SET Titulo = @Titulo,
-//        Descripcion = @Descripcion,
-//        Precio = @Precio,
-//        Stock = @Stock,
-//        Genero = @Genero,
-//        Plataforma = @Plataforma,
-//        Img = @Img,
-//        Activo = @Activo
-//    WHERE Id = @Id;
-//    END
-//    GO
-    #endregion
+    
     public class JuegoRepository
     {
         private TiendaJuegosContext context;
@@ -202,22 +132,27 @@ namespace ProyectoIndividualMvcNet.Repositories
           
         }
 
-        public async Task<List<Juego>> GetJuegosCompradosAsync(int idUsuario)
+        public async Task<List<CompraRealizada>> GetJuegosCompradosAsync(int idUsuario)
         {
-            var consulta = from detalle in this.context.PedidoDetalle
-                           join pedido in this.context.Pedidos on detalle.PedidoId equals pedido.Id
-                           join juego in this.context.Juegos on detalle.JuegoId equals juego.Id
-                           where pedido.UsuarioId == idUsuario
-                           select juego;
-
-            return await consulta.ToListAsync();
+            return await this.context.ComprasRealizadas
+                             .Where(x => x.UsuarioId == idUsuario)
+                             .OrderByDescending(x => x.FechaCompra)
+                             .ToListAsync();
         }
         public async Task ProcesarPedidoCarritoAsync(int idUsuario, List<Juego> carrito)
         {
-            // 1. Calculamos el total de todos los juegos del carrito
-            decimal totalPedido = carrito.Sum(j => j.Precio);
+            var carritoAgrupado = carrito
+                .GroupBy(j => j.Id)
+                .Select(grupo => new {
+                    IdJuego = grupo.Key,
+                    CantidadTotal = grupo.Count(),
+                    PrecioUnitario = grupo.First().Precio
+                }).ToList();
 
-            // 2. Creamos la cabecera del Pedido
+            
+            decimal totalPedido = carritoAgrupado.Sum(item => item.PrecioUnitario * item.CantidadTotal);
+
+
             Pedido pedido = new Pedido
             {
                 UsuarioId = idUsuario,
@@ -225,24 +160,27 @@ namespace ProyectoIndividualMvcNet.Repositories
                 Total = totalPedido
             };
             this.context.Pedidos.Add(pedido);
-            await this.context.SaveChangesAsync(); // Para obtener el pedido.Id
+  
+            await this.context.SaveChangesAsync();
 
-            // 3. Recorremos el carrito para crear los detalles y bajar stock
-            foreach (Juego item in carrito)
+            foreach (var item in carritoAgrupado)
             {
-                // Buscamos el juego real en DB para actualizar su stock
-                Juego dbJuego = await this.context.Juegos.FindAsync(item.Id);
+                Juego dbJuego = await this.context.Juegos.FindAsync(item.IdJuego);
 
-                if (dbJuego != null && dbJuego.Stock > 0)
+                if (dbJuego != null && dbJuego.Stock >= item.CantidadTotal)
                 {
-                    dbJuego.Stock -= 1;
-                    if (dbJuego.Stock == 0) dbJuego.Activo = false;
+                    // Restamos la cantidad agrupada del stock real
+                    dbJuego.Stock -= item.CantidadTotal;
 
+                    if (dbJuego.Stock == 0)
+                    {
+                        dbJuego.Activo = false;
+                    }
                     PedidoDetalle detalle = new PedidoDetalle
                     {
                         PedidoId = pedido.Id,
                         JuegoId = dbJuego.Id,
-                        Cant = 1,
+                        Cant = item.CantidadTotal, 
                         Precio = dbJuego.Precio
                     };
                     this.context.PedidoDetalle.Add(detalle);

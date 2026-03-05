@@ -170,24 +170,40 @@
                                     <form asp-action="Comprar" method="post" class="mb-2">
                                         <input type="hidden" name="idJuego" value="@juego.Id" />
                                         <input type="hidden" name="precio" value="@juego.Precio" />
-                                        <button type="submit" class="btn btn-lg w-100 shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                                        <button type="submit" class="btn btn-lg w-100 shadow-lg btn-comprar-ahora">
                                             <i class="bi bi-lightning-charge-fill me-2"></i>Comprar Ahora
                                         </button>
                                     </form>
                                     
-                                    <!-- Botón Añadir al Carrito -->
+                                    <!-- Selector de cantidad + Añadir al Carrito -->
                                     @if (!estaEnCarrito)
                                     {
                                         <form asp-action="AgregarAlCarrito" method="post" class="mb-2">
                                             <input type="hidden" name="idJuego" value="@juego.Id" />
-                                            <button type="submit" class="btn btn-outline-light w-100">
-                                                <i class="bi bi-cart-plus me-2"></i>Añadir al Carrito
-                                            </button>
+                                            <input type="hidden" name="returnUrl" value="Index" />
+                                            
+                                            <div class="d-flex gap-2 mb-2">
+                                                <div style="width: 100px;">
+                                                    <label class="form-label small text-white-50 mb-1">Cantidad</label>
+                                                    <input type="number" 
+                                                           name="cantidad" 
+                                                           class="form-control form-control-sm bg-dark text-white text-center" 
+                                                           value="1" 
+                                                           min="1" 
+                                                           max="@juego.Stock" />
+                                                </div>
+                                                <div class="flex-grow-1 d-flex align-items-end">
+                                                    <button type="submit" class="btn btn-outline-light w-100">
+                                                        <i class="bi bi-cart-plus me-2"></i>Añadir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted d-block">Stock disponible: @juego.Stock</small>
                                         </form>
                                     }
                                     else
                                     {
-                                        <a asp-controller="Carrito" asp-action="Index" class="btn w-100 mb-2" style="background: var(--gaming-accent, #ff006e); color: #fff;">
+                                        <a asp-controller="Carrito" asp-action="Index" class="btn w-100 mb-2 btn-ver-carrito">
                                             <i class="bi bi-cart-check me-2"></i>Ver en Carrito
                                         </a>
                                     }
@@ -204,22 +220,17 @@
                                     <i class="bi bi-eye me-2"></i>Ver Detalles
                                 </a>
 
-                                <!-- Botones de Administrador -->
-                                @if (isAdmin)
-                                {
-                                    <div class="btn-group w-100" role="group">
-                                        <a asp-action="Edit" asp-route-idjuego="@juego.Id"
-                                           class="btn btn-outline-warning btn-sm"
-                                           title="Editar">
-                                            <i class="bi bi-pencil me-1"></i>Editar
-                                        </a>
-                                        <a asp-action="Delete" asp-route-idjuego="@juego.Id"
-                                           class="btn btn-outline-danger btn-sm"
-                                           title="Eliminar">
-                                            <i class="bi bi-trash me-1"></i>Eliminar
-                                        </a>
-                                    </div>
-                                }
+                                <div class="mt-2 d-flex gap-2">
+                                    <a asp-action="Edit" asp-route-idjuego="@juego.Id"
+                                       class="btn btn-admin-edit flex-fill">
+                                        <i class="bi bi-pencil-square me-1"></i>Editar
+                                    </a>
+                                    <a asp-action="Delete" asp-route-idjuego="@juego.Id"
+                                       class="btn btn-admin-delete flex-fill"
+                                       onclick="return confirm('¿Eliminar @juego.Titulo?');">
+                                        <i class="bi bi-trash3 me-1"></i>Eliminar
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -309,15 +320,84 @@
         --gaming-accent: #ff006e;
     }
 
-    /* Animación del botón de compra */
-    .btn[style*="--gaming-primary"]:hover {
+    /* Botón Comprar Ahora */
+    .btn-comprar-ahora {
+        background: var(--gaming-primary);
+        color: #000;
+        font-weight: bold;
+        border: none;
+    }
+
+    .btn-comprar-ahora:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5) !important;
+        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+        color: #000;
+    }
+
+    /* Botón Ver en Carrito */
+    .btn-ver-carrito {
+        background: var(--gaming-accent);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+    }
+
+    .btn-ver-carrito:hover {
+        background: #c82333;
+        color: #fff;
+    }
+
+    /* Input de cantidad */
+    input[type="number"].form-control {
+        font-weight: 700;
+    }
+
+    /* Ocultar flechas del input number */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        opacity: 1;
+    }
+
+    /* Botones de Editar/Eliminar */
+    .btn-admin-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        border: 2px solid #ffc107;
+        color: #000;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-admin-edit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.5);
+        background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+        color: #000;
+    }
+
+    .btn-admin-delete {
+        background: linear-gradient(135deg, #ff006e 0%, #c82333 100%);
+        border: 2px solid #ff006e;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-admin-delete:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 0, 110, 0.6);
+        background: linear-gradient(135deg, #c82333 0%, #ff006e 100%);
+        color: white;
     }
 
     /* Toast notification */
     .toast {
-        border: 2px solid var(--gaming-primary, #00ff88);
+        border: 2px solid var(--gaming-primary);
     }
     
     /* Badge del carrito animado */

@@ -9,14 +9,6 @@ namespace ProyectoIndividualMvcNet.Repositories
 {
     public class UsuarioRepository
     {
-        #region ProcedureVista
-//        CREATE VIEW V_USUARIOS_LOGIN AS
-//SELECT
-//    U.IDUSUARIO, U.NOMBRE, U.EMAIL, U.IMAGEN, U.RolId,
-//    S.SALT, S.PASS
-//FROM Usuarios U
-//JOIN Usuarios_Security S ON U.IDUSUARIO = S.IDUSUARIO
-        #endregion
         private TiendaJuegosContext context;
 
         public UsuarioRepository(TiendaJuegosContext context)

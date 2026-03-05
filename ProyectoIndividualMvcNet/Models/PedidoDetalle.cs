@@ -27,5 +27,6 @@ namespace ProyectoIndividualMvcNet.Models
 
         [ForeignKey("JuegoId")]
         public virtual Juego Juego { get; set; }
+   
     }
 }
