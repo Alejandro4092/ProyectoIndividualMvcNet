@@ -1,27 +1,14 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.CodeAnalysis;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using ProyectoIndividualMvcNet.Data;
 using ProyectoIndividualMvcNet.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Drawing;
-using System.Numerics;
-using System.Runtime.Intrinsics.X86;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
-    
     public class JuegoRepository
     {
         private TiendaJuegosContext context;
+
         public JuegoRepository(TiendaJuegosContext context)
         {
             this.context = context;
@@ -59,21 +46,23 @@ namespace ProyectoIndividualMvcNet.Repositories
 
             return consulta;
         }
-        public async Task InsertarJuegoAsync(string titulo, string descripcion, decimal precio, int stock, string genero, string plataforma, string img, bool activo)
+        public async Task InsertJuegoAsync(string titulo, string descripcion, decimal precio, 
+            int stock, string genero, string plataforma, string img, bool activo)
         {
-            // El SQL con los nombres de los parámetros del Procedure
-            string sql = "sp_InsertarJuego @titulo, @descripcion, @precio, @stock, @genero, @plataforma, @img, @activo";
+            string sql = "sp_InsertarJuego @Titulo, @Descripcion, @Precio, @Stock, @Genero, @Plataforma, @Img, @Activo";
 
-            SqlParameter pamTit = new SqlParameter("@titulo", titulo);
-            SqlParameter pamDesc = new SqlParameter("@descripcion",descripcion);
-            SqlParameter pamPre = new SqlParameter("@precio", precio);
-            SqlParameter pamStock = new SqlParameter("@stock", stock);
-            SqlParameter pamGen = new SqlParameter("@genero", genero);
-            SqlParameter pamPlat = new SqlParameter("@plataforma",plataforma);
-            SqlParameter pamImg = new SqlParameter("@img",img);
-            SqlParameter pamAct = new SqlParameter("@activo", activo);
+            SqlParameter pamTitulo = new SqlParameter("@Titulo", titulo);
+            SqlParameter pamDescripcion = new SqlParameter("@Descripcion", descripcion);
+            SqlParameter pamPrecio = new SqlParameter("@Precio", precio);
+            SqlParameter pamStock = new SqlParameter("@Stock", stock);
+            SqlParameter pamGenero = new SqlParameter("@Genero", genero);
+            SqlParameter pamPlataforma = new SqlParameter("@Plataforma", plataforma);
+            SqlParameter pamImg = new SqlParameter("@Img", img);
+            SqlParameter pamActivo = new SqlParameter("@Activo", activo);
 
-            await this.context.Database.ExecuteSqlRawAsync(sql, pamTit, pamDesc, pamPre, pamStock, pamGen, pamPlat, pamImg, pamAct);
+            await this.context.Database.ExecuteSqlRawAsync(sql, 
+                pamTitulo, pamDescripcion, pamPrecio, pamStock, 
+                pamGenero, pamPlataforma, pamImg, pamActivo);
         }
         public async Task EliminarJuegoAsync(int id)
         {
@@ -83,21 +72,24 @@ namespace ProyectoIndividualMvcNet.Repositories
 
             await this.context.Database.ExecuteSqlRawAsync(sql, pamId);
         }
-        public async Task EditarJuegoAsync(int id, string titulo, string descripcion, decimal precio, int stock, string genero, string plataforma, string img, bool activo)
+        public async Task EditJuegoAsync(int id, string titulo, string descripcion, decimal precio,
+            int stock, string genero, string plataforma, string img, bool activo)
         {
-            string sql = "sp_EditarJuego @id, @titulo, @descripcion, @precio, @stock, @genero, @plataforma, @img, @activo";
+            string sql = "sp_EditarJuego @Id, @Titulo, @Descripcion, @Precio, @Stock, @Genero, @Plataforma, @Img, @Activo";
 
-            SqlParameter pamId = new SqlParameter("@id", id);
-            SqlParameter pamTit = new SqlParameter("@titulo", titulo);
-            SqlParameter pamDesc = new SqlParameter("@descripcion", descripcion);
-            SqlParameter pamPre = new SqlParameter("@precio", precio);
-            SqlParameter pamStock = new SqlParameter("@stock", stock);
-            SqlParameter pamGen = new SqlParameter("@genero", genero);
-            SqlParameter pamPlat = new SqlParameter("@plataforma", plataforma);
-            SqlParameter pamImg = new SqlParameter("@img", img);
-            SqlParameter pamAct = new SqlParameter("@activo", activo);
+            SqlParameter pamId = new SqlParameter("@Id", id);
+            SqlParameter pamTitulo = new SqlParameter("@Titulo", titulo);
+            SqlParameter pamDescripcion = new SqlParameter("@Descripcion", descripcion);
+            SqlParameter pamPrecio = new SqlParameter("@Precio", precio);
+            SqlParameter pamStock = new SqlParameter("@Stock", stock);
+            SqlParameter pamGenero = new SqlParameter("@Genero", genero);
+            SqlParameter pamPlataforma = new SqlParameter("@Plataforma", plataforma);
+            SqlParameter pamImg = new SqlParameter("@Img", img);
+            SqlParameter pamActivo = new SqlParameter("@Activo", activo);
 
-            await this.context.Database.ExecuteSqlRawAsync(sql, pamId, pamTit, pamDesc, pamPre, pamStock, pamGen, pamPlat, pamImg, pamAct);
+            await this.context.Database.ExecuteSqlRawAsync(sql,
+                pamId, pamTitulo, pamDescripcion, pamPrecio, pamStock,
+                pamGenero, pamPlataforma, pamImg, pamActivo);
         }
         public async Task ComprarJuegoAsync(int idUsuario, int idJuego, decimal precio)
         {
@@ -213,7 +205,7 @@ namespace ProyectoIndividualMvcNet.Repositories
             return await this.context.Juegos
                 .Include(j => j.PedidoDetalles)
                 .OrderByDescending(j => j.PedidoDetalles.Count) 
-                .Take(5) // Top 5
+                .Take(5) 
                 .ToListAsync();
         }
         public async Task<List<Resena>> GetAllResenasAsync()
@@ -222,7 +214,7 @@ namespace ProyectoIndividualMvcNet.Repositories
                 .OrderByDescending(r => r.Fecha)
                 .ToListAsync();
         }
-       
+      
 
     }
 }

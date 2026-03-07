@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProyectoIndividualMvcNet.Data;
+using ProyectoIndividualMvcNet.Helpers;
 using ProyectoIndividualMvcNet.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<TiendaJuegosContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("SqlTiendaJuego")));
 builder.Services.AddTransient<JuegoRepository>();
 builder.Services.AddTransient<UsuarioRepository>(); 
+builder.Services.AddScoped<ImageHelper>();
 
 var app = builder.Build();
 

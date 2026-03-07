@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProyectoIndividualMvcNet.Extensions;
+using ProyectoIndividualMvcNet.Helpers;
 using ProyectoIndividualMvcNet.Models;
 using ProyectoIndividualMvcNet.Repositories;
 
@@ -8,10 +9,12 @@ namespace ProyectoIndividualMvcNet.Controllers
     public class JuegosController : Controller
     {
         private JuegoRepository repo;
+        private readonly ImageHelper imageHelper;
 
-        public JuegosController(JuegoRepository repo)
+        public JuegosController(JuegoRepository repo, ImageHelper imageHelper)
         {
             this.repo = repo;
+            this.imageHelper = imageHelper;
         }
 
         public async Task<IActionResult> Index(string? texto, string? genero, string? plataforma)
@@ -50,20 +53,48 @@ namespace ProyectoIndividualMvcNet.Controllers
             TempData["MENSAJE"] = "¡Reseña publicada con éxito!";
             return RedirectToAction("Details", new { idjuego = idJuego });
         }
+
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Juego juego)
+        public async Task<IActionResult> Create(Juego juego, IFormFile imagenFile)
         {
-            await this.repo.InsertarJuegoAsync(
-                juego.Titulo, juego.Descripcion, juego.Precio,
-                juego.Stock, juego.Genero, juego.Plataforma,
-                juego.Img, juego.Activo
-            );
-            return RedirectToAction("Index");
+            try
+            {
+                string imagenBase64 = null;
+
+                if (imagenFile != null && imagenFile.Length > 0)
+                {
+                    imagenBase64 = await this.imageHelper.ConvertToBase64Async(imagenFile);
+                }
+
+                if (string.IsNullOrEmpty(imagenBase64))
+                {
+                    imagenBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+                }
+
+                await this.repo.InsertJuegoAsync(
+                    juego.Titulo,
+                    juego.Descripcion,
+                    juego.Precio,
+                    juego.Stock,
+                    juego.Genero,
+                    juego.Plataforma,
+                    imagenBase64,
+                    juego.Activo
+                );
+
+                TempData["MENSAJE"] = "Juego creado exitosamente";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ERROR"] = "Error al crear el juego: " + ex.Message;
+                return View(juego);
+            }
         }
 
         public async Task<IActionResult> Edit(int idjuego)
@@ -78,19 +109,50 @@ namespace ProyectoIndividualMvcNet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Juego juego)
+        public async Task<IActionResult> Edit(Juego juego, IFormFile imagenFile)
         {
-            await this.repo.EditarJuegoAsync(
-                juego.Id, juego.Titulo, juego.Descripcion,
-                juego.Precio, juego.Stock, juego.Genero,
-                juego.Plataforma, juego.Img, juego.Activo
-            );
-            return RedirectToAction("Index");
+            try
+            {
+                var juegoActual = await this.repo.FindJuegoAsync(juego.Id);
+
+                if (juegoActual == null)
+                {
+                    return NotFound();
+                }
+
+                string imagenBase64 = juegoActual.Img;
+
+                if (imagenFile != null && imagenFile.Length > 0)
+                {
+                    imagenBase64 = await this.imageHelper.ConvertToBase64Async(imagenFile);
+                }
+
+                await this.repo.EditJuegoAsync(
+                    juego.Id,
+                    juego.Titulo,
+                    juego.Descripcion,
+                    juego.Precio,
+                    juego.Stock,
+                    juego.Genero,
+                    juego.Plataforma,
+                    imagenBase64,
+                    juego.Activo
+                );
+
+                TempData["MENSAJE"] = "Juego actualizado exitosamente";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ERROR"] = "Error al actualizar el juego: " + ex.Message;
+                return View(juego);
+            }
         }
 
         public async Task<IActionResult> Delete(int idjuego)
         {
             await this.repo.EliminarJuegoAsync(idjuego);
+            TempData["MENSAJE"] = "Juego eliminado exitosamente";
             return RedirectToAction("Index");
         }
 
@@ -116,34 +178,29 @@ namespace ProyectoIndividualMvcNet.Controllers
             {
                 return RedirectToAction("Login", "Usuarios");
             }
-            
+
             var misJuegos = await this.repo.GetJuegosCompradosAsync(user.IdUsuario);
-            return View(misJuegos); // Returns List<CompraRealizada>
+            return View(misJuegos);
         }
 
         [HttpPost]
         public IActionResult AgregarAlCarrito(int idJuego, int cantidad = 1)
         {
-            // Validar cantidad
             if (cantidad < 1) cantidad = 1;
 
-            // Obtener carrito de sesión
             List<Juego> carrito = HttpContext.Session.GetObject<List<Juego>>("CARRITO") ?? new List<Juego>();
-            
-            // Buscar el juego
+
             Juego juego = this.repo.FindJuegoAsync(idJuego).Result;
-            
+
             if (juego != null)
             {
-                // Verificar stock
                 int cantidadEnCarrito = carrito.Count(j => j.Id == idJuego);
                 if (cantidadEnCarrito + cantidad > juego.Stock)
                 {
                     TempData["ERROR"] = $"No hay suficiente stock de '{juego.Titulo}'. Disponible: {juego.Stock}, ya tienes en carrito: {cantidadEnCarrito}";
-                    return RedirectToAction("Index"); // Volver al catálogo
+                    return RedirectToAction("Index");
                 }
 
-                // Añadir las copias al carrito
                 for (int i = 0; i < cantidad; i++)
                 {
                     carrito.Add(juego);
@@ -157,9 +214,9 @@ namespace ProyectoIndividualMvcNet.Controllers
                 TempData["ERROR"] = "Juego no encontrado";
             }
 
-            // CAMBIO CLAVE: Redirigir a Index en lugar de Details
             return RedirectToAction("Index");
         }
+
         public async Task<IActionResult> PanelEstadisticas()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");

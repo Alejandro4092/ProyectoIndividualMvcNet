@@ -14,72 +14,92 @@
     int cantidadCarrito = carrito.Count;
 }
 
-<!-- Hero Section - SIN botón Mi Carrito -->
+<!-- Hero Section con botón Crear -->
 <div class="bg-dark text-white py-5 mb-4">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
                 <h1 class="display-4 fw-bold mb-3">
-                    <i class="bi bi-controller me-2"></i>Catálogo de Juegos
+                    <i class="bi bi-shop me-3" style="color: var(--gaming-primary, #00ff88);"></i>
+                    Tienda de Juegos
                 </h1>
-                <p class="lead mb-0">Descubre nuestra increíble colección de videojuegos</p>
+                <p class="lead mb-0">Explora nuestro catálogo completo</p>
             </div>
-            @if (isAdmin)
-            {
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                    <a asp-action="Create" class="btn btn-success btn-lg shadow">
-                        <i class="bi bi-plus-circle me-2"></i>Agregar Juego
-                    </a>
-                </div>
-            }
+            <div class="col-lg-4 text-end">
+                <a asp-action="Create" class="btn btn-lg shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Crear Nuevo Juego
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Filtros y búsqueda -->
+<!-- Barra de búsqueda/filtros -->
 <div class="container mb-4">
-    <form asp-action="Index" method="get">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="texto" class="form-control" placeholder="Buscar juegos..." value="@texto">
+    <div class="card bg-dark border-0 shadow">
+        <div class="card-body">
+            <form asp-action="Index" method="get">
+                <div class="row g-3 align-items-end">
+                    <!-- Campo de búsqueda por texto -->
+                    <div class="col-md-3">
+                        <label class="form-label text-white">
+                            <i class="bi bi-search me-1"></i>Buscar
+                        </label>
+                        <input type="text" 
+                               name="texto" 
+                               class="form-control" 
+                               placeholder="Título del juego..."
+                               value="@texto">
+                    </div>
+
+                    <!-- Filtro por género -->
+                    <div class="col-md-3">
+                        <label class="form-label text-white">
+                            <i class="bi bi-tag me-1"></i>Género
+                        </label>
+                        <select name="genero" class="form-select">
+                            <option value="">Todos los géneros</option>
+                            <option value="Acción" selected="@(genero == "Acción")">Acción</option>
+                            <option value="Aventura" selected="@(genero == "Aventura")">Aventura</option>
+                            <option value="RPG" selected="@(genero == "RPG")">RPG</option>
+                            <option value="Deportes" selected="@(genero == "Deportes")">Deportes</option>
+                            <option value="Estrategia" selected="@(genero == "Estrategia")">Estrategia</option>
+                            <option value="Simulación" selected="@(genero == "Simulación")">Simulación</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por plataforma -->
+                    <div class="col-md-3">
+                        <label class="form-label text-white">
+                            <i class="bi bi-joystick me-1"></i>Plataforma
+                        </label>
+                        <select name="plataforma" class="form-select">
+                            <option value="">Todas las plataformas</option>
+                            <option value="PlayStation" selected="@(plataforma == "PlayStation")">PlayStation</option>
+                            <option value="Xbox" selected="@(plataforma == "Xbox")">Xbox</option>
+                            <option value="Nintendo Switch" selected="@(plataforma == "Nintendo Switch")">Nintendo Switch</option>
+                            <option value="PC" selected="@(plataforma == "PC")">PC</option>
+                        </select>
+                    </div>
+
+                    <!-- Botones de buscar y limpiar -->
+                    <div class="col-md-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel-fill me-2"></i>Buscar
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <select name="genero" class="form-select">
-                    <option value="">Todos los géneros</option>
-                    <option value="Acción" selected="@(genero == "Acción")">Acción</option>
-                    <option value="Aventura" selected="@(genero == "Aventura")">Aventura</option>
-                    <option value="RPG" selected="@(genero == "RPG")">RPG</option>
-                    <option value="Deportes" selected="@(genero == "Deportes")">Deportes</option>
-                    <option value="Estrategia" selected="@(genero == "Estrategia")">Estrategia</option>
-                    <option value="Simulación" selected="@(genero == "Simulación")">Simulación</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="plataforma" class="form-select">
-                    <option value="">Todas las plataformas</option>
-                    <option value="PlayStation" selected="@(plataforma == "PlayStation")">PlayStation</option>
-                    <option value="Xbox" selected="@(plataforma == "Xbox")">Xbox</option>
-                    <option value="Nintendo Switch" selected="@(plataforma == "Nintendo Switch")">Nintendo Switch</option>
-                    <option value="PC" selected="@(plataforma == "PC")">PC</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-funnel-fill me-2"></i>Buscar
-                    </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
-                    </a>
-                </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
+<!-- Lista de juegos -->
 <div class="container">
     @if (Model != null && Model.Any())
     {
@@ -220,16 +240,21 @@
                                     <i class="bi bi-eye me-2"></i>Ver Detalles
                                 </a>
 
+                                <!-- BOTONES DE EDITAR Y ELIMINAR - SIEMPRE VISIBLES -->
                                 <div class="mt-2 d-flex gap-2">
                                     <a asp-action="Edit" asp-route-idjuego="@juego.Id"
                                        class="btn btn-admin-edit flex-fill">
                                         <i class="bi bi-pencil-square me-1"></i>Editar
                                     </a>
-                                    <a asp-action="Delete" asp-route-idjuego="@juego.Id"
-                                       class="btn btn-admin-delete flex-fill"
-                                       onclick="return confirm('¿Eliminar @juego.Titulo?');">
-                                        <i class="bi bi-trash3 me-1"></i>Eliminar
-                                    </a>
+                                    <!-- En lugar del enlace <a>, usar un form -->
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="idjuego" value="@juego.Id" />
+                                        <button type="submit" 
+                                                class="btn btn-admin-delete flex-fill"
+                                                onclick="return confirm('¿Estás seguro de eliminar @juego.Titulo?');">
+                                            <i class="bi bi-trash3 me-1"></i>Eliminar
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -350,12 +375,6 @@
     /* Input de cantidad */
     input[type="number"].form-control {
         font-weight: 700;
-    }
-
-    /* Ocultar flechas del input number */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        opacity: 1;
     }
 
     /* Botones de Editar/Eliminar */
