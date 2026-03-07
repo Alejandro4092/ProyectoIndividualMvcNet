@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-
-namespace ProyectoIndividualMvcNet.Helpers
+﻿namespace ProyectoIndividualMvcNet.Helpers
 {
     public class ImageHelper
     {
@@ -15,52 +8,47 @@ namespace ProyectoIndividualMvcNet.Helpers
         {
             _environment = environment;
         }
-
-        public async Task<string> SaveImageAsync(IFormFile imageFile, string folderPath = "images/juegos")
+        public async Task<ImageResult> SaveImageAndGetBase64Async(IFormFile imageFile, string folderPath = "images/juegos")
         {
             if (imageFile == null || imageFile.Length == 0)
                 return null;
-            if (!IsValidImageFile(imageFile))
-                throw new InvalidOperationException("El archivo debe ser una imagen válida (jpg, jpeg, png, gif)");
 
+            if (!IsValidImageFile(imageFile))
+                throw new InvalidOperationException("El archivo debe ser una imagen válida (jpg, jpeg, png, gif, webp)");
+
+            // 1. Generar nombre único para el archivo
             string fileName = GenerateUniqueFileName(imageFile.FileName);
             string uploadsFolder = Path.Combine(_environment.WebRootPath, folderPath);
+
+            // 2. Crear directorio si no existe
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
             string filePath = Path.Combine(uploadsFolder, fileName);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            // 3. Convertir a Base64 Y guardar en disco simultáneamente
+            string base64String;
+            using (var memoryStream = new MemoryStream())
             {
-                await imageFile.CopyToAsync(fileStream);
+                await imageFile.CopyToAsync(memoryStream);
+                byte[] imageBytes = memoryStream.ToArray();
+
+                // Convertir a Base64
+                base64String = Convert.ToBase64String(imageBytes);
+
+                // Guardar archivo en disco
+                await File.WriteAllBytesAsync(filePath, imageBytes);
             }
 
-            return $"/{folderPath}/{fileName}";
-        }
-            public void DeleteImage(string imagePath)
-        {
-            if (string.IsNullOrEmpty(imagePath))
-                return;
+            string mimeType = GetMimeType(imageFile.FileName);
+            string base64WithPrefix = $"data:{mimeType};base64,{base64String}";
+            string relativePath = $"/{folderPath}/{fileName}";
 
-            // Convertir ruta relativa a absoluta
-            string fullPath = Path.Combine(_environment.WebRootPath, imagePath.TrimStart('/'));
-
-            if (File.Exists(fullPath))
+            return new ImageResult
             {
-                try
-                {
-                    File.Delete(fullPath);
-                }
-                catch (Exception)
-                {
-                    
-                }
-            }
-        }
-        public async Task<string> UpdateImageAsync(IFormFile newImageFile, string oldImagePath, string folderPath = "images/juegos")
-        {
-            if (newImageFile == null || newImageFile.Length == 0)
-                return oldImagePath;
-            if (!string.IsNullOrEmpty(oldImagePath))
-                DeleteImage(oldImagePath);
-            return await SaveImageAsync(newImageFile, folderPath);
+                Base64 = base64WithPrefix,
+                FilePath = relativePath
+            };
         }
         public async Task<string> ConvertToBase64Async(IFormFile imageFile)
         {
@@ -80,6 +68,30 @@ namespace ProyectoIndividualMvcNet.Helpers
             }
         }
 
+        public void DeleteImageFile(string imagePath)
+        {
+            if (string.IsNullOrEmpty(imagePath))
+                return;
+
+            // Si es Base64, no hay archivo que eliminar
+            if (imagePath.StartsWith("data:"))
+                return;
+
+            string fullPath = Path.Combine(_environment.WebRootPath, imagePath.TrimStart('/'));
+
+            if (File.Exists(fullPath))
+            {
+                try
+                {
+                    File.Delete(fullPath);
+                }
+                catch
+                {
+                    
+                }
+            }
+        }
+
         private bool IsValidImageFile(IFormFile file)
         {
             if (file == null)
@@ -87,19 +99,7 @@ namespace ProyectoIndividualMvcNet.Helpers
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
             return allowedExtensions.Contains(extension);
-        }
-        private string GenerateUniqueFileName(string originalFileName)
-        {
-            string extension = Path.GetExtension(originalFileName);
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
-           
-            fileNameWithoutExtension = string.Join("_", fileNameWithoutExtension.Split(Path.GetInvalidFileNameChars()));
-            
-            string uniqueFileName = $"{fileNameWithoutExtension}_{DateTime.Now:yyyyMMddHHmmss}{extension}";
-            
-            return uniqueFileName;
         }
 
         private string GetMimeType(string fileName)
@@ -114,5 +114,21 @@ namespace ProyectoIndividualMvcNet.Helpers
                 _ => "image/jpeg"
             };
         }
+
+        private string GenerateUniqueFileName(string originalFileName)
+        {
+            string extension = Path.GetExtension(originalFileName);
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+            fileNameWithoutExtension = string.Join("_", fileNameWithoutExtension.Split(Path.GetInvalidFileNameChars()));
+            string uniqueFileName = $"{fileNameWithoutExtension}_{DateTime.Now:yyyyMMddHHmmss}{extension}";
+            return uniqueFileName;
+        }
+    }
+
+
+    public class ImageResult
+    {
+        public string Base64 { get; set; }
+        public string FilePath { get; set; }
     }
 }

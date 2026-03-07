@@ -64,16 +64,18 @@ namespace ProyectoIndividualMvcNet.Controllers
         {
             try
             {
-                string imagenBase64 = null;
+                string imagenBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
+                // Guardar imagen en disco Y obtener Base64
                 if (imagenFile != null && imagenFile.Length > 0)
                 {
-                    imagenBase64 = await this.imageHelper.ConvertToBase64Async(imagenFile);
-                }
-
-                if (string.IsNullOrEmpty(imagenBase64))
-                {
-                    imagenBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+                    var imageResult = await this.imageHelper.SaveImageAndGetBase64Async(imagenFile);
+                    if (imageResult != null)
+                    {
+                        imagenBase64 = imageResult.Base64;
+                        // El archivo ya se guardó en wwwroot/images/juegos
+                        // imageResult.FilePath contiene la ruta relativa si la necesitas
+                    }
                 }
 
                 await this.repo.InsertJuegoAsync(
@@ -87,7 +89,7 @@ namespace ProyectoIndividualMvcNet.Controllers
                     juego.Activo
                 );
 
-                TempData["MENSAJE"] = "Juego creado exitosamente";
+                TempData["MENSAJE"] = "Juego creado exitosamente (imagen guardada en BD y disco)";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -122,9 +124,16 @@ namespace ProyectoIndividualMvcNet.Controllers
 
                 string imagenBase64 = juegoActual.Img;
 
+                // Si hay nueva imagen, guardarla en disco Y obtener Base64
                 if (imagenFile != null && imagenFile.Length > 0)
                 {
-                    imagenBase64 = await this.imageHelper.ConvertToBase64Async(imagenFile);
+                    var imageResult = await this.imageHelper.SaveImageAndGetBase64Async(imagenFile);
+                    if (imageResult != null)
+                    {
+                        imagenBase64 = imageResult.Base64;
+                        // Opcional: eliminar imagen antigua del disco
+                        // this.imageHelper.DeleteImageFile(juegoActual.Img);
+                    }
                 }
 
                 await this.repo.EditJuegoAsync(
@@ -151,8 +160,22 @@ namespace ProyectoIndividualMvcNet.Controllers
 
         public async Task<IActionResult> Delete(int idjuego)
         {
-            await this.repo.EliminarJuegoAsync(idjuego);
-            TempData["MENSAJE"] = "Juego eliminado exitosamente";
+            try
+            {
+                // Opcional: obtener el juego para eliminar su imagen del disco
+                var juego = await this.repo.FindJuegoAsync(idjuego);
+                if (juego != null)
+                {
+                    this.imageHelper.DeleteImageFile(juego.Img);
+                }
+
+                await this.repo.EliminarJuegoAsync(idjuego);
+                TempData["MENSAJE"] = "Juego eliminado exitosamente";
+            }
+            catch (Exception ex)
+            {
+                TempData["ERROR"] = "Error al eliminar el juego: " + ex.Message;
+            }
             return RedirectToAction("Index");
         }
 
