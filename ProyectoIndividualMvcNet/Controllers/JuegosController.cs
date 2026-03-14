@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProyectoIndividualMvcNet.Extensions;
+using ProyectoIndividualMvcNet.Filters;
 using ProyectoIndividualMvcNet.Helpers;
 using ProyectoIndividualMvcNet.Models;
 using ProyectoIndividualMvcNet.Repositories;
@@ -39,6 +41,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             return View(juego);
         }
 
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> PostResena(int idJuego, int nota, string comentario)
         {
@@ -54,17 +57,22 @@ namespace ProyectoIndividualMvcNet.Controllers
             return RedirectToAction("Details", new { idjuego = idJuego });
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<IActionResult> Create(Juego juego, IFormFile imagenFile)
         {
             try
             {
-                string imagenBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+                string imagenBase64 =
+                    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
                 // Guardar imagen en disco Y obtener Base64
                 if (imagenFile != null && imagenFile.Length > 0)
@@ -99,6 +107,8 @@ namespace ProyectoIndividualMvcNet.Controllers
             }
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Edit(int idjuego)
         {
             Juego juego = await this.repo.FindJuegoAsync(idjuego);
@@ -110,6 +120,8 @@ namespace ProyectoIndividualMvcNet.Controllers
             return View(juego);
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost]
         public async Task<IActionResult> Edit(Juego juego, IFormFile imagenFile)
         {
@@ -158,6 +170,8 @@ namespace ProyectoIndividualMvcNet.Controllers
             }
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int idjuego)
         {
             try
@@ -179,6 +193,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             return RedirectToAction("Index");
         }
 
+        [AuthorizeUsuarios]
         [HttpPost]
         public async Task<IActionResult> Comprar(int idJuego, decimal precio)
         {
@@ -194,6 +209,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             return RedirectToAction("MisCompras");
         }
 
+        [AuthorizeUsuarios]
         public async Task<IActionResult> MisCompras()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
@@ -206,6 +222,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             return View(misJuegos);
         }
 
+        [AuthorizeUsuarios]
         [HttpPost]
         public IActionResult AgregarAlCarrito(int idJuego, int cantidad = 1)
         {
@@ -240,6 +257,8 @@ namespace ProyectoIndividualMvcNet.Controllers
             return RedirectToAction("Index");
         }
 
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> PanelEstadisticas()
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");

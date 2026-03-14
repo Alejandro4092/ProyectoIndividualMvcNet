@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProyectoIndividualMvcNet.Extensions;
+using ProyectoIndividualMvcNet.Filters;
 using ProyectoIndividualMvcNet.Models;
 using ProyectoIndividualMvcNet.Repositories;
 
@@ -11,12 +12,15 @@ public class CarritoController : Controller
     {
         this.repo = repo;
     }
+
     public IActionResult Index()
     {
         List<Juego> carrito = HttpContext.Session.GetObject<List<Juego>>("CARRITO")
                               ?? new List<Juego>();
         return View(carrito);
     }
+
+    [AuthorizeUsuarios]
     public async Task<IActionResult> FinalizarCompra()
     {
         Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
@@ -25,15 +29,14 @@ public class CarritoController : Controller
         if (user == null) return RedirectToAction("Login", "Usuarios");
         if (carrito == null || carrito.Count == 0) return RedirectToAction("Index", "Juegos");
 
-        // Llamamos a tu nuevo método del Repo
         await this.repo.ProcesarPedidoCarritoAsync(user.IdUsuario, carrito);
 
-        // Limpiamos el carrito de la sesión tras la compra
         HttpContext.Session.Remove("CARRITO");
 
         TempData["MENSAJE"] = "¡Pedido procesado con éxito! Gracias por tu compra.";
         return RedirectToAction("MisCompras", "Juegos");
     }
+
     public IActionResult Quitar(int idjuego)
     {
         List<Juego> carrito = HttpContext.Session.GetObject<List<Juego>>("CARRITO") ?? new List<Juego>();

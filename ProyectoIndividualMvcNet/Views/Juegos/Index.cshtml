@@ -7,9 +7,9 @@
     var texto = ViewData["TEXTO"] as string ?? "";
     var genero = ViewData["GENERO"] as string ?? "";
     var plataforma = ViewData["PLATAFORMA"] as string ?? "";
-    
+
     // Obtener el carrito de la sesión
-    var carrito = Context.Session.GetObject<List<ProyectoIndividualMvcNet.Models.Juego>>("CARRITO") 
+    var carrito = Context.Session.GetObject<List<ProyectoIndividualMvcNet.Models.Juego>>("CARRITO")
                   ?? new List<ProyectoIndividualMvcNet.Models.Juego>();
     int cantidadCarrito = carrito.Count;
 }
@@ -25,11 +25,16 @@
                 </h1>
                 <p class="lead mb-0">Explora nuestro catálogo completo</p>
             </div>
-            <div class="col-lg-4 text-end">
-                <a asp-action="Create" class="btn btn-lg shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
-                    <i class="bi bi-plus-circle-fill me-2"></i>Crear Nuevo Juego
-                </a>
-            </div>
+
+            @* SOLO ADMIN *@
+            @if (Context.User.IsInRole("ADMIN"))
+            {
+                <div class="col-lg-4 text-end">
+                    <a asp-action="Create" class="btn btn-lg shadow-lg" style="background: var(--gaming-primary, #00ff88); color: #000; font-weight: bold;">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Crear Nuevo Juego
+                    </a>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -45,9 +50,9 @@
                         <label class="form-label text-white">
                             <i class="bi bi-search me-1"></i>Buscar
                         </label>
-                        <input type="text" 
-                               name="texto" 
-                               class="form-control" 
+                        <input type="text"
+                               name="texto"
+                               class="form-control"
                                placeholder="Título del juego..."
                                value="@texto">
                     </div>
@@ -107,7 +112,7 @@
             @foreach (var juego in Model)
             {
                 var estaEnCarrito = carrito.Any(j => j.Id == juego.Id);
-                
+
                 <div class="col">
                     <div class="card h-100 bg-dark border-0 shadow-lg game-card">
                         <!-- Imagen del juego -->
@@ -136,7 +141,7 @@
                                     <i class="bi bi-x-circle me-1"></i>Agotado
                                 </span>
                             }
-                            
+
                             <!-- Badge "En el carrito" -->
                             @if (estaEnCarrito)
                             {
@@ -194,14 +199,14 @@
                                             <i class="bi bi-lightning-charge-fill me-2"></i>Comprar Ahora
                                         </button>
                                     </form>
-                                    
+
                                     <!-- Selector de cantidad + Añadir al Carrito -->
                                     @if (!estaEnCarrito)
                                     {
                                         <form asp-action="AgregarAlCarrito" method="post" class="mb-2">
                                             <input type="hidden" name="idJuego" value="@juego.Id" />
                                             <input type="hidden" name="returnUrl" value="Index" />
-                                            
+
                                             <div class="d-flex gap-2 mb-2">
                                                 <div style="width: 100px;">
                                                     <label class="form-label small text-white-50 mb-1">Cantidad</label>
@@ -240,22 +245,25 @@
                                     <i class="bi bi-eye me-2"></i>Ver Detalles
                                 </a>
 
-                                <!-- BOTONES DE EDITAR Y ELIMINAR - SIEMPRE VISIBLES -->
-                                <div class="mt-2 d-flex gap-2">
-                                    <a asp-action="Edit" asp-route-idjuego="@juego.Id"
-                                       class="btn btn-admin-edit flex-fill">
-                                        <i class="bi bi-pencil-square me-1"></i>Editar
-                                    </a>
-                                    <!-- En lugar del enlace <a>, usar un form -->
-                                    <form asp-action="Delete" method="post" class="d-inline">
-                                        <input type="hidden" name="idjuego" value="@juego.Id" />
-                                        <button type="submit" 
-                                                class="btn btn-admin-delete flex-fill"
-                                                onclick="return confirm('¿Estás seguro de eliminar @juego.Titulo?');">
-                                            <i class="bi bi-trash3 me-1"></i>Eliminar
-                                        </button>
-                                    </form>
-                                </div>
+                                <!-- SOLO ADMIN: Editar/Eliminar -->
+                                @if (Context.User.IsInRole("ADMIN"))
+                                {
+                                    <div class="mt-2 d-flex gap-2">
+                                        <a asp-action="Edit" asp-route-idjuego="@juego.Id"
+                                           class="btn btn-admin-edit flex-fill">
+                                            <i class="bi bi-pencil-square me-1"></i>Editar
+                                        </a>
+
+                                        <form asp-action="Delete" method="post" class="d-inline">
+                                            <input type="hidden" name="idjuego" value="@juego.Id" />
+                                            <button type="submit"
+                                                    class="btn btn-admin-delete flex-fill"
+                                                    onclick="return confirm('¿Estás seguro de eliminar @juego.Titulo?');">
+                                                <i class="bi bi-trash3 me-1"></i>Eliminar
+                                            </button>
+                                        </form>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
