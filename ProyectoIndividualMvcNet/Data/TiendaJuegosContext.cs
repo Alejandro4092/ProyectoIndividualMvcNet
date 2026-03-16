@@ -5,7 +5,6 @@ namespace ProyectoIndividualMvcNet.Data
 {
     public class TiendaJuegosContext : DbContext
     {
-        // ÚNICO CONSTRUCTOR: el que recibe las opciones de DI
         public TiendaJuegosContext(DbContextOptions<TiendaJuegosContext> options)
             : base(options) { }
 

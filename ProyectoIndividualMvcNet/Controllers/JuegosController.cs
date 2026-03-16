@@ -26,7 +26,6 @@ namespace ProyectoIndividualMvcNet.Controllers
             int? posicion
         )
         {
-            // Página actual por defecto
             if (posicion == null || posicion < 1)
             {
                 posicion = 1;
@@ -34,37 +33,31 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             const int pageSize = 10;
 
-            // Total de juegos que cumplen los filtros
             int totalJuegos = await this.repo.GetNumeroJuegosFiltradosSpAsync(
                 texto,
                 genero,
                 plataforma
             );
 
-            // 2. Número de páginas
             int numeroPaginas = (int)Math.Ceiling(totalJuegos / (double)pageSize);
             if (numeroPaginas < 1)
             {
                 numeroPaginas = 1;
             }
 
-            // 3. Ajustar página actual si se sale de rango
             if (posicion.Value > numeroPaginas)
             {
                 posicion = numeroPaginas;
             }
 
-            //  Filtros para mantenerlos en la vista
             ViewData["TEXTO"] = texto;
             ViewData["GENERO"] = genero;
             ViewData["PLATAFORMA"] = plataforma;
 
-            // Datos de paginación que la vista ya usa
-            ViewData["NUMEROREGISTROS"] = numeroPaginas; // número total de páginas
-            ViewData["POSICIONACTUAL"] = posicion.Value; // página actual
-            ViewData["TOTALJUEGOS"] = totalJuegos; // total de juegos filtrados
+            ViewData["NUMEROREGISTROS"] = numeroPaginas;
+            ViewData["POSICIONACTUAL"] = posicion.Value;
+            ViewData["TOTALJUEGOS"] = totalJuegos;
 
-            // Obtener solo la página actual de juegos usando el SP paginado
             var juegos = await this.repo.GetGrupoJuegosFiltradosSpAsync(
                 posicion.Value,
                 pageSize,
@@ -73,7 +66,6 @@ namespace ProyectoIndividualMvcNet.Controllers
                 plataforma
             );
 
-            // La vista Index.cshtml espera IEnumerable<Juego>
             return View(juegos);
         }
 
@@ -129,15 +121,12 @@ namespace ProyectoIndividualMvcNet.Controllers
                 string imagenBase64 =
                     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
-                // Guardar imagen en disco Y obtener Base64
                 if (imagenFile != null && imagenFile.Length > 0)
                 {
                     var imageResult = await this.imageHelper.SaveImageAndGetBase64Async(imagenFile);
                     if (imageResult != null)
                     {
                         imagenBase64 = imageResult.Base64;
-                        // El archivo ya se guardó en wwwroot/images/juegos
-                        // imageResult.FilePath contiene la ruta relativa si la necesitas
                     }
                 }
 
@@ -191,15 +180,12 @@ namespace ProyectoIndividualMvcNet.Controllers
 
                 string imagenBase64 = juegoActual.Img;
 
-                // Si hay nueva imagen, guardarla en disco Y obtener Base64
                 if (imagenFile != null && imagenFile.Length > 0)
                 {
                     var imageResult = await this.imageHelper.SaveImageAndGetBase64Async(imagenFile);
                     if (imageResult != null)
                     {
                         imagenBase64 = imageResult.Base64;
-                        // Opcional: eliminar imagen antigua del disco
-                        // this.imageHelper.DeleteImageFile(juegoActual.Img);
                     }
                 }
 
@@ -231,7 +217,6 @@ namespace ProyectoIndividualMvcNet.Controllers
         {
             try
             {
-                // Opcional: obtener el juego para eliminar su imagen del disco
                 var juego = await this.repo.FindJuegoAsync(idjuego);
                 if (juego != null)
                 {
@@ -337,10 +322,8 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             ViewBag.TopVentas = await this.repo.GetJuegosMasVendidosAsync();
 
-            // Datos para la sección "Distribución por Género"
             ViewBag.DistribucionGeneros = await this.repo.GetDistribucionJuegosPorGeneroAsync();
 
-            // Datos para la sección "Tendencia de Ventas" (últimos 6 meses)
             ViewBag.TendenciaVentas = await this.repo.GetTendenciaVentasMensualesAsync(6);
 
             return View();
