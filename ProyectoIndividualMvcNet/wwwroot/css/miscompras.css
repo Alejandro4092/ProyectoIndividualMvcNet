@@ -1,0 +1,52 @@
+﻿/* Card de juego con efecto hover */
+.game-card {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3) !important;
+    }
+
+/* Overlay que aparece al hacer hover */
+.game-overlay {
+    background: rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.game-card:hover .game-overlay {
+    opacity: 1;
+}
+
+/* Animación de botones */
+.game-overlay button {
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.game-card:hover .game-overlay button {
+    transform: translateY(0);
+}
+
+/* Variables CSS */
+:root {
+    --gaming-primary: #00ff88;
+    --gaming-secondary: #0a84ff;
+    --gaming-accent: #ff006e;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem !important;
+    }
+
+    .game-overlay button {
+        width: 150px !important;
+        padding: 8px !important;
+        font-size: 0.9rem !important;
+    }
+}

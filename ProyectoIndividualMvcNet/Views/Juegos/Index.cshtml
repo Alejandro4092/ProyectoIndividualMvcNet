@@ -17,6 +17,9 @@
                   ?? new List<ProyectoIndividualMvcNet.Models.Juego>();
     int cantidadCarrito = carrito.Count;
 }
+@section Styles {
+    <link rel="stylesheet" href="~/css/juegos-index.css" asp-append-version="true" />
+}
 
 <!-- Hero Section con botón Crear -->
 <div class="bg-dark text-white py-5 mb-4">
@@ -362,107 +365,3 @@
     </div>
 }
 
-<style>
-    /* Card de juego con efecto hover */
-    .game-card {
-        transition: all 0.3s ease;
-        border: 1px solid rgba(0, 255, 136, 0.2) !important;
-    }   
-
-    .game-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3) !important;
-        border-color: var(--gaming-primary, #00ff88) !important;
-    }
-
-    /* Variables CSS */
-    :root {
-        --gaming-primary: #00ff88;
-        --gaming-secondary: #0a84ff;
-        --gaming-accent: #ff006e;
-    }
-
-    /* Botón Comprar Ahora */
-    .btn-comprar-ahora {
-        background: var(--gaming-primary);
-        color: #000;
-        font-weight: bold;
-        border: none;
-    }
-
-    .btn-comprar-ahora:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
-        color: #000;
-    }
-
-    /* Botón Ver en Carrito */
-    .btn-ver-carrito {
-        background: var(--gaming-accent);
-        color: #fff;
-        border: none;
-        font-weight: 600;
-    }
-
-    .btn-ver-carrito:hover {
-        background: #c82333;
-        color: #fff;
-    }
-
-    /* Input de cantidad */
-    input[type="number"].form-control {
-        font-weight: 700;
-    }
-
-    /* Botones de Editar/Eliminar */
-    .btn-admin-edit {
-        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-        border: 2px solid #ffc107;
-        color: #000;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-admin-edit:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.5);
-        background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
-        color: #000;
-    }
-
-    .btn-admin-delete {
-        background: linear-gradient(135deg, #ff006e 0%, #c82333 100%);
-        border: 2px solid #ff006e;
-        color: white;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-admin-delete:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255, 0, 110, 0.6);
-        background: linear-gradient(135deg, #c82333 0%, #ff006e 100%);
-        color: white;
-    }
-
-    /* Toast notification */
-    .toast {
-        border: 2px solid var(--gaming-primary);
-    }
-    
-    /* Badge del carrito animado */
-    .badge.rounded-pill {
-        animation: pulse-badge 2s infinite;
-    }
-    
-    @@keyframes pulse-badge {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-</style>

@@ -1,0 +1,95 @@
+﻿
+
+.sticky-top {
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+}
+
+/* Estilo para el sistema de estrellas */
+.star-rating-label {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-rating-label i {
+    color: #6c757d;
+    transition: all 0.2s ease;
+}
+
+/* Estrella activa (llenada) */
+.star-rating-label i.active {
+    color: #ffc107;
+}
+
+.star-rating-label:hover i,
+.star-rating-label:hover ~ .star-rating-label i,
+.star-rating-label input:checked ~ i,
+.star-rating-label input:checked ~ .star-rating-label i {
+    color: #ffc107 !important;
+}
+
+/* Efecto hover en las estrellas de calificación */
+.star-rating-label:hover i {
+    color: #ffc107 !important;
+    transform: scale(1.2);
+}
+
+/* Animación para las reseñas */
+.resena-item {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Toast notification */
+.toast {
+    border: 2px solid var(--gaming-primary);
+}
+
+/* Selector de cantidad */
+.quantity-selector {
+    text-align: center;
+}
+
+.quantity-selector .input-group {
+    box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity-selector .btn {
+    border-color: var(--gaming-primary);
+    color: var(--gaming-primary);
+}
+
+.quantity-selector .btn:hover {
+    background-color: var(--gaming-primary);
+    color: #000;
+}
+
+.quantity-selector input[type="number"] {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Ocultar las flechas del input number (opcional) */
+.quantity-selector input[type="number"]::-webkit-inner-spin-button,
+.quantity-selector input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.quantity-selector input[type="number"] {
+    -moz-appearance: textfield;
+}
