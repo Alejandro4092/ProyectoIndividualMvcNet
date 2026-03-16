@@ -191,31 +191,81 @@
         </div>
     </div>
 
-    <!-- Gráficos adicionales (placeholder para futuras mejoras) -->
+    <!-- Gráficos adicionales -->
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="card stats-card">
-                <div class="card-header" style="background: linear-gradient(135deg, var(--gaming-secondary) 0%, var(--gaming-primary) 100%); color: white; border-bottom: 3px solid var(--gaming-secondary);">
-                    <h5 class="mb-0">
-                        <i class="bi bi-pie-chart me-2"></i>Distribución por Género
+            <div class="card stats-card stats-card-graph">
+                <div class="card-header graph-header graph-header-primary">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-circle-half me-2"></i>
+                        Distribución por Género
                     </h5>
                 </div>
                 <div class="card-body text-center py-5">
-                    <i class="bi bi-pie-chart" style="font-size: 4rem; color: var(--gaming-secondary); opacity: 0.3;"></i>
-                    <p class="text-muted mt-3">Próximamente: Gráfico de distribución</p>
+                    @{
+                        var dist = ViewBag.DistribucionGeneros as List<GeneroDistribucionDto>;
+                    }
+                    @if (dist != null && dist.Count > 0)
+                    {
+                        <div class="mini-bar-chart">
+                            @{
+                                int max = dist.Max(x => x.Cantidad);
+                            }
+                            @foreach (var item in dist)
+                            {
+                                var height = max == 0 ? 10 : (int)(40 + (item.Cantidad * 40.0 / max));
+                                <span title="@item.Genero: @item.Cantidad" style="height:@(height)px"></span>
+                            }
+                        </div>
+                        <div class="mini-legend mt-3">
+                            @string.Join(" · ", dist.Select(d => $"{d.Genero}: {d.Cantidad}"))
+                        </div>
+                    }
+                    else
+                    {
+                        <i class="bi bi-pie-chart-fill graph-icon-primary"></i>
+                        <p class="graph-caption mt-4">
+                            Próximamente: Gráfico de distribución
+                        </p>
+                    }
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card stats-card">
-                <div class="card-header" style="background: linear-gradient(135deg, var(--gaming-accent) 0%, #ff6b9d 100%); color: white; border-bottom: 3px solid var(--gaming-accent);">
-                    <h5 class="mb-0">
-                        <i class="bi bi-graph-up me-2"></i>Tendencia de Ventas
+            <div class="card stats-card stats-card-graph">
+                <div class="card-header graph-header graph-header-accent">
+                    <h5 class="mb-0 d-flex align-items-center">
+                        <i class="bi bi-graph-up-arrow me-2"></i>
+                        Tendencia de Ventas
                     </h5>
                 </div>
                 <div class="card-body text-center py-5">
-                    <i class="bi bi-graph-up-arrow" style="font-size: 4rem; color: var(--gaming-accent); opacity: 0.3;"></i>
-                    <p class="text-muted mt-3">Próximamente: Gráfico de tendencias</p>
+                    @{
+                        var tendencia = ViewBag.TendenciaVentas as List<VentasMensualesDto>;
+                    }
+                    @if (tendencia != null && tendencia.Count > 0)
+                    {
+                        <div class="mini-bar-chart">
+                            @{
+                                int maxUnidades = tendencia.Max(x => x.TotalUnidades);
+                            }
+                            @foreach (var item in tendencia)
+                            {
+                                var altura = maxUnidades == 0 ? 10 : (int)(40 + (item.TotalUnidades * 40.0 / maxUnidades));
+                                <span class="accent" title="@item.Mes/@item.Anio: @item.TotalUnidades uds" style="height:@(altura)px"></span>
+                            }
+                        </div>
+                        <div class="mini-legend mt-3">
+                            @string.Join(" · ", tendencia.Select(t => $"{t.Mes}/{t.Anio}: {t.TotalUnidades} uds"))
+                        </div>
+                    }
+                    else
+                    {
+                        <i class="bi bi-graph-up graph-icon-accent"></i>
+                        <p class="graph-caption mt-4">
+                            Próximamente: Gráfico de tendencias
+                        </p>
+                    }
                 </div>
             </div>
         </div>

@@ -8,6 +8,10 @@
     var genero = ViewData["GENERO"] as string ?? "";
     var plataforma = ViewData["PLATAFORMA"] as string ?? "";
 
+    int numeroPaginas = ViewData["NUMEROREGISTROS"] != null ? (int)ViewData["NUMEROREGISTROS"] : 1;
+    int actual = ViewData["POSICIONACTUAL"] != null ? (int)ViewData["POSICIONACTUAL"] : 1;
+    int totalJuegos = ViewData["TOTALJUEGOS"] != null ? (int)ViewData["TOTALJUEGOS"] : 0;
+
     // Obtener el carrito de la sesión
     var carrito = Context.Session.GetObject<List<ProyectoIndividualMvcNet.Models.Juego>>("CARRITO")
                   ?? new List<ProyectoIndividualMvcNet.Models.Juego>();
@@ -270,6 +274,31 @@
                 </div>
             }
         </div>
+
+        @if (numeroPaginas > 1)
+        {
+            <div class="mt-5 text-center">
+                @{
+                    int pagina = 1;
+                }
+                @for (int i = 1; i <= numeroPaginas; i++)
+                {
+                    <a class="btn btn-sm me-2 mb-2 @(i == actual ? "btn-primary" : "btn-outline-light")"
+                       asp-action="Index"
+                       asp-route-posicion="@i"
+                       asp-route-texto="@texto"
+                       asp-route-genero="@genero"
+                       asp-route-plataforma="@plataforma">
+                       @pagina
+                    </a>
+                    pagina++;
+                }
+
+                <div class="text-white-50 small mt-3">
+                    Página @actual de @numeroPaginas · @totalJuegos juegos
+                </div>
+            </div>
+        }
     }
     else
     {

@@ -91,7 +91,7 @@
                         {
                             <form asp-action="AgregarAlCarrito" method="post" class="d-flex align-items-center gap-3">
                                 <input type="hidden" name="idJuego" value="@Model.Id" />
-                                
+
                                 <!-- Input de cantidad -->
                                 <div class="quantity-selector">
                                     <label for="cantidad" class="form-label text-white mb-1 small">Cantidad:</label>
@@ -99,13 +99,13 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" onclick="decrementQuantity()">
                                             <i class="bi bi-dash"></i>
                                         </button>
-                                        <input type="number" 
-                                               id="cantidad" 
-                                               name="cantidad" 
-                                               class="form-control form-control-sm text-center bg-dark text-white" 
-                                               value="1" 
-                                               min="1" 
-                                               max="@Model.Stock" 
+                                        <input type="number"
+                                               id="cantidad"
+                                               name="cantidad"
+                                               class="form-control form-control-sm text-center bg-dark text-white"
+                                               value="1"
+                                               min="1"
+                                               max="@Model.Stock"
                                                style="border-left: none; border-right: none;" />
                                         <button type="button" class="btn btn-outline-light btn-sm" onclick="incrementQuantity(@Model.Stock)">
                                             <i class="bi bi-plus"></i>
@@ -504,6 +504,11 @@
             transition: all 0.2s ease;
         }
 
+        /* Estrella activa (llenada) */
+        .star-rating-label i.active {
+            color: #ffc107;
+        }
+
         .star-rating-label:hover i,
         .star-rating-label:hover ~ .star-rating-label i,
         .star-rating-label input:checked ~ i,
@@ -544,42 +549,42 @@
         text-align: center;
     }
 
-    .quantity-selector .input-group {
-        box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
-        border-radius: 8px;
-        overflow: hidden;
-    }
+        .quantity-selector .input-group {
+            box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    .quantity-selector .btn {
-        border-color: var(--gaming-primary);
-        color: var(--gaming-primary);
-    }
+        .quantity-selector .btn {
+            border-color: var(--gaming-primary);
+            color: var(--gaming-primary);
+        }
 
-    .quantity-selector .btn:hover {
-        background-color: var(--gaming-primary);
-        color: #000;
-    }
+            .quantity-selector .btn:hover {
+                background-color: var(--gaming-primary);
+                color: #000;
+            }
 
-    .quantity-selector input[type="number"] {
-        font-weight: 700;
-        font-size: 1rem;
-    }
+        .quantity-selector input[type="number"] {
+            font-weight: 700;
+            font-size: 1rem;
+        }
 
-    /* Ocultar las flechas del input number (opcional) */
-    .quantity-selector input[type="number"]::-webkit-inner-spin-button,
-    .quantity-selector input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+            /* Ocultar las flechas del input number (opcional) */
+            .quantity-selector input[type="number"]::-webkit-inner-spin-button,
+            .quantity-selector input[type="number"]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
 
-    .quantity-selector input[type="number"] {
-        -moz-appearance: textfield;
-    }
+        .quantity-selector input[type="number"] {
+            -moz-appearance: textfield;
+        }
 </style>
 
 @section Scripts {
     <!-- Scripts existentes -->
-    
+
     <script>
         // Función para incrementar cantidad
         function incrementQuantity(maxStock) {
@@ -603,12 +608,71 @@
         document.getElementById('cantidad')?.addEventListener('input', function() {
             const maxStock = parseInt(this.max);
             let value = parseInt(this.value);
-            
+
             if (value < 1) {
                 this.value = 1;
             } else if (value > maxStock) {
                 this.value = maxStock;
             }
         });
+
+        // Calificación por estrellas
+        document.addEventListener('DOMContentLoaded', function () {
+    const starLabels = document.querySelectorAll('.star-rating-label');
+
+    if (starLabels.length === 0) {
+        return;
+    }
+
+    function pintarHasta(valor) {
+        starLabels.forEach(label => {
+            const icon = label.querySelector('i[data-rating]');
+            const rating = parseInt(icon.getAttribute('data-rating'));
+
+            if (rating <= valor) {
+                icon.classList.add('active');
+            } else {
+                icon.classList.remove('active');
+            }
+        });
+    }
+
+    starLabels.forEach(label => {
+        const input = label.querySelector('input[type="radio"]');
+        const icon = label.querySelector('i[data-rating]');
+        const valor = parseInt(icon.getAttribute('data-rating'));
+
+        // Click: marca el radio y pinta hasta esa estrella
+        label.addEventListener('click', function () {
+            input.checked = true;
+            pintarHasta(valor);
+        });
+
+        // Hover: mostrar preview sin cambiar el valor marcado
+        label.addEventListener('mouseenter', function () {
+            pintarHasta(valor);
+        });
+    });
+
+    // Al salir del área de estrellas, restaurar según el radio seleccionado
+    const starsContainer = starLabels[0].parentElement;
+    starsContainer.addEventListener('mouseleave', function () {
+        const checked = document.querySelector('.star-rating-label input[type="radio"]:checked');
+        if (checked) {
+            const valor = parseInt(checked.value);
+            pintarHasta(valor);
+        } else {
+            pintarHasta(0);
+        }
+    });
+
+    // Estado inicial (por si quieres que empiece en 5, etc.)
+    const inicial = document.querySelector('.star-rating-label input[type="radio"]:checked');
+    if (inicial) {
+        pintarHasta(parseInt(inicial.value));
+    } else {
+        pintarHasta(0);
+    }
+});
     </script>
 }

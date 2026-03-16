@@ -11,7 +11,7 @@ namespace ProyectoIndividualMvcNet.Controllers
     public class JuegosController : Controller
     {
         private JuegoRepository repo;
-        private readonly ImageHelper imageHelper;
+        private ImageHelper imageHelper;
 
         public JuegosController(JuegoRepository repo, ImageHelper imageHelper)
         {
@@ -19,12 +19,61 @@ namespace ProyectoIndividualMvcNet.Controllers
             this.imageHelper = imageHelper;
         }
 
-        public async Task<IActionResult> Index(string? texto, string? genero, string? plataforma)
+        public async Task<IActionResult> Index(
+            string? texto,
+            string? genero,
+            string? plataforma,
+            int? posicion
+        )
         {
-            var juegos = await this.repo.GetJuegosPlataformaGeneroAsync(texto, genero, plataforma);
+            // Página actual por defecto
+            if (posicion == null || posicion < 1)
+            {
+                posicion = 1;
+            }
+
+            const int pageSize = 10;
+
+            // Total de juegos que cumplen los filtros
+            int totalJuegos = await this.repo.GetNumeroJuegosFiltradosSpAsync(
+                texto,
+                genero,
+                plataforma
+            );
+
+            // 2. Número de páginas
+            int numeroPaginas = (int)Math.Ceiling(totalJuegos / (double)pageSize);
+            if (numeroPaginas < 1)
+            {
+                numeroPaginas = 1;
+            }
+
+            // 3. Ajustar página actual si se sale de rango
+            if (posicion.Value > numeroPaginas)
+            {
+                posicion = numeroPaginas;
+            }
+
+            //  Filtros para mantenerlos en la vista
             ViewData["TEXTO"] = texto;
             ViewData["GENERO"] = genero;
             ViewData["PLATAFORMA"] = plataforma;
+
+            // Datos de paginación que la vista ya usa
+            ViewData["NUMEROREGISTROS"] = numeroPaginas; // número total de páginas
+            ViewData["POSICIONACTUAL"] = posicion.Value; // página actual
+            ViewData["TOTALJUEGOS"] = totalJuegos; // total de juegos filtrados
+
+            // Obtener solo la página actual de juegos usando el SP paginado
+            var juegos = await this.repo.GetGrupoJuegosFiltradosSpAsync(
+                posicion.Value,
+                pageSize,
+                texto,
+                genero,
+                plataforma
+            );
+
+            // La vista Index.cshtml espera IEnumerable<Juego>
             return View(juegos);
         }
 
@@ -43,16 +92,22 @@ namespace ProyectoIndividualMvcNet.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostResena(int idJuego, int nota, string comentario)
         {
             Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
-
             if (user == null)
             {
                 return RedirectToAction("Login", "Usuarios");
             }
 
-            await this.repo.InsertarResenaAsync(user.IdUsuario, idJuego, nota, comentario);
+            if (nota < 1 || nota > 5 || string.IsNullOrWhiteSpace(comentario))
+            {
+                TempData["ERROR"] = "Datos de reseña no válidos.";
+                return RedirectToAction("Details", new { idjuego = idJuego });
+            }
+
+            await this.repo.InsertarResenaAsync(user.IdUsuario, idJuego, nota, comentario.Trim());
             TempData["MENSAJE"] = "¡Reseña publicada con éxito!";
             return RedirectToAction("Details", new { idjuego = idJuego });
         }
@@ -197,16 +252,24 @@ namespace ProyectoIndividualMvcNet.Controllers
         [HttpPost]
         public async Task<IActionResult> Comprar(int idJuego, decimal precio)
         {
-            Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
-
-            if (user == null)
+            try
             {
-                return RedirectToAction("Login", "Usuarios");
-            }
+                Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
+                if (user == null)
+                {
+                    TempData["ERROR"] = "Tu sesión ha caducado. Inicia sesión de nuevo.";
+                    return RedirectToAction("Login", "Usuarios");
+                }
 
-            await this.repo.ComprarJuegoAsync(user.IdUsuario, idJuego, precio);
-            TempData["MENSAJE"] = "¡Compra realizada con éxito!";
-            return RedirectToAction("MisCompras");
+                await this.repo.ComprarJuegoAsync(user.IdUsuario, idJuego, precio);
+                TempData["MENSAJE"] = "¡Compra realizada con éxito!";
+                return RedirectToAction("MisCompras");
+            }
+            catch (Exception ex)
+            {
+                TempData["ERROR"] = $"Error al comprar: {ex.Message}";
+                return RedirectToAction("Index");
+            }
         }
 
         [AuthorizeUsuarios]
@@ -226,9 +289,11 @@ namespace ProyectoIndividualMvcNet.Controllers
         [HttpPost]
         public IActionResult AgregarAlCarrito(int idJuego, int cantidad = 1)
         {
-            if (cantidad < 1) cantidad = 1;
+            if (cantidad < 1)
+                cantidad = 1;
 
-            List<Juego> carrito = HttpContext.Session.GetObject<List<Juego>>("CARRITO") ?? new List<Juego>();
+            List<Juego> carrito =
+                HttpContext.Session.GetObject<List<Juego>>("CARRITO") ?? new List<Juego>();
 
             Juego juego = this.repo.FindJuegoAsync(idJuego).Result;
 
@@ -237,7 +302,8 @@ namespace ProyectoIndividualMvcNet.Controllers
                 int cantidadEnCarrito = carrito.Count(j => j.Id == idJuego);
                 if (cantidadEnCarrito + cantidad > juego.Stock)
                 {
-                    TempData["ERROR"] = $"No hay suficiente stock de '{juego.Titulo}'. Disponible: {juego.Stock}, ya tienes en carrito: {cantidadEnCarrito}";
+                    TempData["ERROR"] =
+                        $"No hay suficiente stock de '{juego.Titulo}'. Disponible: {juego.Stock}, ya tienes en carrito: {cantidadEnCarrito}";
                     return RedirectToAction("Index");
                 }
 
@@ -247,7 +313,8 @@ namespace ProyectoIndividualMvcNet.Controllers
                 }
 
                 HttpContext.Session.SetObject("CARRITO", carrito);
-                TempData["MENSAJE"] = $"✓ Se añadieron {cantidad} unidad(es) de '{juego.Titulo}' al carrito";
+                TempData["MENSAJE"] =
+                    $"✓ Se añadieron {cantidad} unidad(es) de '{juego.Titulo}' al carrito";
             }
             else
             {
@@ -269,6 +336,13 @@ namespace ProyectoIndividualMvcNet.Controllers
             }
 
             ViewBag.TopVentas = await this.repo.GetJuegosMasVendidosAsync();
+
+            // Datos para la sección "Distribución por Género"
+            ViewBag.DistribucionGeneros = await this.repo.GetDistribucionJuegosPorGeneroAsync();
+
+            // Datos para la sección "Tendencia de Ventas" (últimos 6 meses)
+            ViewBag.TendenciaVentas = await this.repo.GetTendenciaVentasMensualesAsync(6);
+
             return View();
         }
     }
