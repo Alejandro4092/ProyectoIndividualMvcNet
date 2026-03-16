@@ -18,5 +18,7 @@ namespace ProyectoIndividualMvcNet.Models
 
         [ForeignKey("IdUsuario")]
         public virtual Usuario Usuario { get; set; }
+        [Column("password")] 
+        public string Password { get; set; }
     }
 }

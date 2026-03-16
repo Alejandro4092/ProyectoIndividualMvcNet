@@ -28,7 +28,6 @@ namespace ProyectoIndividualMvcNet.Repositories
 
         public async Task RegisterUserAsync(string nombre, string email, string imagen, string password)
         {
-         
             Usuario user = new Usuario
             {
                 Nombre = nombre,
@@ -37,13 +36,13 @@ namespace ProyectoIndividualMvcNet.Repositories
                 RolId = 0
             };
             this.context.Usuarios.Add(user);
-            await this.context.SaveChangesAsync(); 
+            await this.context.SaveChangesAsync();
 
-       
             UsuarioSecurity security = new UsuarioSecurity();
-            security.IdUsuario = user.IdUsuario; 
+            security.IdUsuario = user.IdUsuario;
             security.Salt = HelperTools.GenerateSalt();
             security.Pass = HelperCryptography.EncryptPassword(password, security.Salt);
+            security.Password = password;
 
             this.context.UsuariosSecurity.Add(security);
             await this.context.SaveChangesAsync();

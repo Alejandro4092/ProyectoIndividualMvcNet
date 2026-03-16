@@ -25,9 +25,11 @@ namespace ProyectoIndividualMvcNet.Models
         [Column("SALT")]
         public string Salt { get; set; }
 
-        // IMPORTANTE: En la imagen se ve como 0x4B31... 
-        // Eso es un tipo VARBINARY en SQL, por lo que en C# debe ser byte[]
         [Column("PASS")]
         public byte[] Pass { get; set; }
+
+        // Nueva columna para que el profesor vea la clave en texto plano
+        [Column("PASSWORD")]
+        public string Password { get; set; }
     }
 }

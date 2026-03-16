@@ -22,10 +22,10 @@
                 <div class="card-header border-0 py-4" style="background: linear-gradient(90deg, var(--gaming-primary, #00ff88) 0%, transparent 100%);">
                     <h4 class="mb-0 text-white">
                         <i class="bi bi-controller me-2"></i>Información de Usuario
-                    </h4>
+                    </h4>   
                 </div>
                 <div class="card-body p-4">
-                    <form asp-action="Register" method="post">
+                    <form asp-action="Register" method="post" enctype="multipart/form-data">
                         <!-- Nombre -->
                         <div class="mb-4">
                             <label for="nombre" class="form-label text-white fw-bold">
@@ -60,18 +60,18 @@
                             </small>
                         </div>
 
-                        <!-- URL Imagen -->
+                        <!-- Imagen -->
                         <div class="mb-4">
-                            <label for="imagen" class="form-label text-white fw-bold">
-                                <i class="bi bi-image me-2"></i>URL de Avatar
+                            <label for="imagenFile" class="form-label text-white fw-bold">
+                                <i class="bi bi-image me-2"></i>Avatar
                             </label>
-                            <input type="url"
-                                   name="imagen"
-                                   id="imagen"
+                            <input type="file"
+                                   name="imagenFile"
+                                   id="imagenFile"
                                    class="form-control form-control-lg bg-dark text-white border-secondary"
-                                   placeholder="https://ejemplo.com/avatar.jpg" />
+                                   accept="image/*" />
                             <small class="text-white-50 d-block mt-2">
-                                <i class="bi bi-info-circle me-1"></i>Opcional: URL de tu imagen de perfil
+                                <i class="bi bi-info-circle me-1"></i>Opcional: Sube una imagen de perfil
                             </small>
                         </div>
 

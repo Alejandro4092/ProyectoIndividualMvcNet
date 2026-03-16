@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoIndividualMvcNet.Extensions;
 using ProyectoIndividualMvcNet.Filters;
+using ProyectoIndividualMvcNet.Helpers;
 using ProyectoIndividualMvcNet.Models;
 using ProyectoIndividualMvcNet.Repositories;
 
@@ -13,10 +14,12 @@ namespace ProyectoIndividualMvcNet.Controllers
     public class UsuariosController : Controller
     {
         private UsuarioRepository repo;
+        private readonly ImageHelper imageHelper;
 
-        public UsuariosController(UsuarioRepository repo)
+        public UsuariosController(UsuarioRepository repo, ImageHelper imageHelper)
         {
             this.repo = repo;
+            this.imageHelper = imageHelper;
         }
 
         public IActionResult ErrorAcceso()
@@ -64,9 +67,15 @@ namespace ProyectoIndividualMvcNet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string nombre, string email, string imagen, string password)
+        public async Task<IActionResult> Register(string nombre, string email, IFormFile imagenFile, string password)
         {
-            await this.repo.RegisterUserAsync(nombre, email, imagen, password);
+            string imagenBase64 = null;
+            if (imagenFile != null && imagenFile.Length > 0)
+            {
+                imagenBase64 = await this.imageHelper.ConvertToBase64Async(imagenFile);
+            }
+
+            await this.repo.RegisterUserAsync(nombre, email, imagenBase64, password);
             return RedirectToAction("Login");
         }
 
