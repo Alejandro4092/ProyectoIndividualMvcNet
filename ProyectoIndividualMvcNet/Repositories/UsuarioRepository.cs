@@ -7,7 +7,7 @@ using ProyectoIndividualMvcNet.Models;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
-    public class UsuarioRepository
+    public class UsuarioRepository : IUsuarioRepository
     {
         private TiendaJuegosContext context;
 
@@ -26,14 +26,19 @@ namespace ProyectoIndividualMvcNet.Repositories
             return await this.context.Usuarios.MaxAsync(z => z.IdUsuario) + 1;
         }
 
-        public async Task RegisterUserAsync(string nombre, string email, string imagen, string password)
+        public async Task RegisterUserAsync(
+            string nombre,
+            string email,
+            string imagen,
+            string password
+        )
         {
             Usuario user = new Usuario
             {
                 Nombre = nombre,
                 Email = email,
                 Imagen = imagen,
-                RolId = 0
+                RolId = 0,
             };
             this.context.Usuarios.Add(user);
             await this.context.SaveChangesAsync();
@@ -50,8 +55,11 @@ namespace ProyectoIndividualMvcNet.Repositories
 
         public async Task<Usuario> LogInUserAsync(string email, string password)
         {
-            var vUser = await this.context.VistaUsuariosLogin.FirstOrDefaultAsync(x => x.Email == email);
-            if (vUser == null) return null;
+            var vUser = await this.context.VistaUsuariosLogin.FirstOrDefaultAsync(x =>
+                x.Email == email
+            );
+            if (vUser == null)
+                return null;
 
             byte[] temp = HelperCryptography.EncryptPassword(password, vUser.Salt);
 
@@ -63,24 +71,30 @@ namespace ProyectoIndividualMvcNet.Repositories
                     Nombre = vUser.Nombre,
                     Email = vUser.Email,
                     Imagen = vUser.Imagen,
-                    RolId = vUser.RolId
+                    RolId = vUser.RolId,
                 };
             }
             return null;
         }
+
         // Busca un usuario por su ID para cargar el perfil
         public async Task<Usuario> FindUsuarioAsync(int idUsuario)
         {
-            return await this.context.Usuarios
-                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            return await this.context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
         }
 
         // Actualiza los datos del usuario en la base de datos
-        public async Task UpdatePerfilSinPasswordAsync(int idUsuario, string nombre, string email, string imagen)
+        public async Task UpdatePerfilSinPasswordAsync(
+            int idUsuario,
+            string nombre,
+            string email,
+            string imagen
+        )
         {
             // Buscamos al usuario real en la base de datos
-            Usuario user = await this.context.Usuarios
-                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            Usuario user = await this.context.Usuarios.FirstOrDefaultAsync(u =>
+                u.IdUsuario == idUsuario
+            );
 
             if (user != null)
             {
@@ -93,38 +107,73 @@ namespace ProyectoIndividualMvcNet.Repositories
                 await this.context.SaveChangesAsync();
             }
         }
+
         // Obtener todos los usuarios de la base de datos
         public async Task<List<Usuario>> GetUsuariosAsync()
         {
             return await this.context.Usuarios.ToListAsync();
         }
 
-        // Eliminar un usuario por su ID
         public async Task DeleteUsuarioAsync(int idUsuario)
         {
-            Usuario user = await this.context.Usuarios
-                .FirstOrDefaultAsync(u => u.IdUsuario == idUsuario);
+            // 1. Borrar Pedidos y sus Detalles (Tablas físicas)
+            var pedidos = await this
+                .context.Pedidos.Where(p => p.UsuarioId == idUsuario)
+                .ToListAsync();
 
+            if (pedidos.Any())
+            {
+                var pedidoIds = pedidos.Select(p => p.Id).ToList();
+                var detalles = await this
+                    .context.PedidoDetalle.Where(d => pedidoIds.Contains(d.PedidoId))
+                    .ToListAsync();
+
+                if (detalles.Any())
+                {
+                    this.context.PedidoDetalle.RemoveRange(detalles);
+                }
+                this.context.Pedidos.RemoveRange(pedidos);
+            }
+
+            // 2. Borrar reseñas (Tabla física)
+            var resenas = await this
+                .context.Resenas.Where(r => r.UsuarioId == idUsuario)
+                .ToListAsync();
+            if (resenas.Any())
+            {
+                this.context.Resenas.RemoveRange(resenas);
+            }
+
+            // NOTA: Se elimina el bloque de ComprasRealizadas
+            // porque es una VISTA no actualizable.
+            // Al borrar Pedidos y Detalles arriba, la vista se actualizará sola.
+
+            // 3. Borrar seguridad
+            var userSecurity = await this.context.UsuariosSecurity.FirstOrDefaultAsync(s =>
+                s.IdUsuario == idUsuario
+            );
+            if (userSecurity != null)
+            {
+                this.context.UsuariosSecurity.Remove(userSecurity);
+            }
+
+            // 4. Borrar usuario
+            var user = await this.context.Usuarios.FirstOrDefaultAsync(u =>
+                u.IdUsuario == idUsuario
+            );
             if (user != null)
             {
-
-                var userSecurity = await this.context.UsuariosSecurity
-                    .FirstOrDefaultAsync(s => s.IdUsuario == idUsuario);
-                
-                if (userSecurity != null)
-                {
-                    this.context.UsuariosSecurity.Remove(userSecurity);
-                }
                 this.context.Usuarios.Remove(user);
-                await this.context.SaveChangesAsync();
             }
+
+            await this.context.SaveChangesAsync();
         }
+
         public async Task<List<Resena>> GetTodasResenasAsync()
         {
-            return await this.context.Resenas
-                .OrderByDescending(r => r.Fecha)
-                .ToListAsync();
+            return await this.context.Resenas.OrderByDescending(r => r.Fecha).ToListAsync();
         }
+
         public async Task DeleteResenaAsync(int idResena)
         {
             Resena resena = await this.context.Resenas.FindAsync(idResena);
@@ -134,6 +183,5 @@ namespace ProyectoIndividualMvcNet.Repositories
                 await this.context.SaveChangesAsync();
             }
         }
-
     }
 }

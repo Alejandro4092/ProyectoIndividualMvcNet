@@ -10,10 +10,10 @@ namespace ProyectoIndividualMvcNet.Controllers
 {
     public class JuegosController : Controller
     {
-        private JuegoRepository repo;
+        private IJuegoRepository repo;
         private ImageHelper imageHelper;
 
-        public JuegosController(JuegoRepository repo, ImageHelper imageHelper)
+        public JuegosController(IJuegoRepository repo, ImageHelper imageHelper)
         {
             this.repo = repo;
             this.imageHelper = imageHelper;

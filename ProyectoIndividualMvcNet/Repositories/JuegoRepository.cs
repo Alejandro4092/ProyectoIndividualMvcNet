@@ -5,7 +5,7 @@ using ProyectoIndividualMvcNet.Models;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
-    public class JuegoRepository
+    public class JuegoRepository : IJuegoRepository
     {
         private TiendaJuegosContext context;
 

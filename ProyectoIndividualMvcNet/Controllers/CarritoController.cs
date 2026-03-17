@@ -6,9 +6,9 @@ using ProyectoIndividualMvcNet.Repositories;
 
 public class CarritoController : Controller
 {
-    private JuegoRepository repo;
+    private IJuegoRepository repo;
 
-    public CarritoController(JuegoRepository repo)
+    public CarritoController(IJuegoRepository repo)
     {
         this.repo = repo;
     }

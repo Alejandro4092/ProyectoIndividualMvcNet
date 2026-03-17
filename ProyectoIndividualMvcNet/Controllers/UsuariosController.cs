@@ -13,10 +13,10 @@ namespace ProyectoIndividualMvcNet.Controllers
 {
     public class UsuariosController : Controller
     {
-        private UsuarioRepository repo;
-        private readonly ImageHelper imageHelper;
+        private IUsuarioRepository repo;
+        private ImageHelper imageHelper;
 
-        public UsuariosController(UsuarioRepository repo, ImageHelper imageHelper)
+        public UsuariosController(IUsuarioRepository repo, ImageHelper imageHelper)
         {
             this.repo = repo;
             this.imageHelper = imageHelper;
@@ -67,7 +67,12 @@ namespace ProyectoIndividualMvcNet.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string nombre, string email, IFormFile imagenFile, string password)
+        public async Task<IActionResult> Register(
+            string nombre,
+            string email,
+            IFormFile imagenFile,
+            string password
+        )
         {
             string imagenBase64 = null;
             if (imagenFile != null && imagenFile.Length > 0)
@@ -107,12 +112,10 @@ namespace ProyectoIndividualMvcNet.Controllers
                 return View();
             }
 
-            // Mantener sesión (tu app lo usa en varios sitios)
             HttpContext.Session.SetObject("USUARIO", user);
             HttpContext.Session.SetString("NOMBRE", user.Nombre);
             HttpContext.Session.SetString("IMAGEN", user.Imagen);
 
-            // Cookie Auth + Claims
             ClaimsIdentity identity = new ClaimsIdentity(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 ClaimTypes.Name,
@@ -121,15 +124,11 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.IdUsuario.ToString()));
             identity.AddClaim(new Claim(ClaimTypes.Name, user.Email ?? user.Nombre ?? "USER"));
-            identity.AddClaim(new Claim("Nombre", user.Nombre ?? ""));
-            identity.AddClaim(new Claim("Imagen", user.Imagen ?? ""));
-            identity.AddClaim(new Claim("RolId", user.RolId.ToString()));
 
-            // Claim Admin para tu policy "AdminOnly"
             if (user.RolId == 1)
             {
-                identity.AddClaim(new Claim("Admin", "true"));
                 identity.AddClaim(new Claim(ClaimTypes.Role, "ADMIN"));
+                identity.AddClaim(new Claim("Admin", "true"));
             }
             else
             {

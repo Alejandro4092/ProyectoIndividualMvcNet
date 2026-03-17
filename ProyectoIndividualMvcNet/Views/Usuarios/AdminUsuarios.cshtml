@@ -205,10 +205,12 @@
                                                     <a asp-action="Perfil" asp-route-idUsuario="@usuario.IdUsuario" class="btn btn-sm btn-outline-primary" title="Ver Perfil">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    <button class="btn btn-sm btn-outline-danger" title="Eliminar" 
-                                                            onclick="confirmarEliminar(@usuario.IdUsuario, '@usuario.Nombre')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
+                                                    <form asp-action="DeleteUsuario" asp-route-idUsuario="@usuario.IdUsuario" method="post" class="d-inline" id="form-eliminar-@usuario.IdUsuario">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar" 
+                                                                onclick="confirmarEliminar(@usuario.IdUsuario, '@usuario.Nombre')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
@@ -331,6 +333,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Búsqueda en tiempo real - Usuarios
         document.getElementById('searchInput')?.addEventListener('keyup', function() {
@@ -366,11 +369,22 @@
             });
         });
 
-        // Confirmación de eliminación de usuario
-        function confirmarEliminar(idUsuario, nombreUsuario) {
-            if (confirm(`¿Estás seguro de eliminar al usuario "${nombreUsuario}"?\n\nEsta acción no se puede deshacer.`)) {
-                window.location.href = `/Usuarios/DeleteUsuario?idUsuario=${idUsuario}`;
-            }
+        // Confirmación de eliminación de usuario con SweetAlert
+        window.confirmarEliminar = function(idUsuario, nombreUsuario) {
+            Swal.fire({
+                title: '¿Eliminar usuario?',
+                text: `¿Estás seguro de eliminar al usuario "${nombreUsuario}"? Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`form-eliminar-${idUsuario}`).submit();
+                }
+            });
         }
     </script>
 }
