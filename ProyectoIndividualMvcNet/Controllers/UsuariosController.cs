@@ -145,6 +145,13 @@ namespace ProyectoIndividualMvcNet.Controllers
             {
                 string controller = TempData["controller"]!.ToString()!;
                 string action = TempData["action"]!.ToString()!;
+                string httpMethod = TempData["httpMethod"]?.ToString() ?? "GET";
+
+                // Si la acción original era POST, redirige al catálogo
+                if (httpMethod == "POST")
+                {
+                    return RedirectToAction("Index", "Juegos");
+                }
 
                 if (TempData["id"] != null)
                 {

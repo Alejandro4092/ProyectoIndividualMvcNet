@@ -21,6 +21,7 @@ namespace ProyectoIndividualMvcNet.Filters
                 var tempData = provider.LoadTempData(context.HttpContext);
                 tempData["controller"] = controller;
                 tempData["action"] = action;
+                tempData["httpMethod"] = context.HttpContext.Request.Method;
 
                 if (id != null) tempData["id"] = id.ToString();
                 else tempData.Remove("id");
