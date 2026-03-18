@@ -7,7 +7,7 @@
     var resenas = ViewBag.Resenas as List<ProyectoIndividualMvcNet.Models.Resena> ?? new List<ProyectoIndividualMvcNet.Models.Resena>();
     var usuario = Context.Session.GetObject<ProyectoIndividualMvcNet.Models.Usuario>("USUARIO");
 
-    // Calcular promedio de calificación
+
     double promedioNota = resenas.Any() ? resenas.Average(r => r.Nota) : 0;
     int totalResenas = resenas.Count;
 }
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="~/css/juegos-details.css" asp-append-version="true" />
 }
 
-<!-- Breadcrumb -->
+
 <div class="container mt-3">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb bg-transparent">
@@ -35,10 +35,10 @@
     </nav>
 </div>
 
-<!-- Detalles del Juego -->
+
 <div class="container mb-5">
     <div class="row g-4">
-        <!-- Columna Izquierda: Imagen y Galería -->
+    
         <div class="col-lg-5">
             <div class="card bg-dark border-0 shadow-lg sticky-top" style="top: 100px;">
                 <div class="position-relative overflow-hidden rounded-3">
@@ -139,7 +139,7 @@
             </div>
         </div>
 
-        <!-- Columna Derecha: Información del Juego -->
+  
         <div class="col-lg-7">
             <div class="mb-4">
                 <h1 class="display-4 fw-bold text-white mb-3">@Model.Titulo</h1>
@@ -181,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- Descripción -->
+        
             <div class="card bg-dark border-0 shadow mb-4">
                 <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-primary) 0%, transparent 100%);">
                     <h5 class="mb-0 text-white">
@@ -200,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- Detalles Técnicos -->
+            
             <div class="card bg-dark border-0 shadow mb-4">
                 <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-secondary) 0%, transparent 100%);">
                     <h5 class="mb-0 text-white">
@@ -247,7 +247,7 @@
                 </div>
             </div>
 
-            <!-- Características -->
+            
             <div class="card bg-dark border-0 shadow mb-4">
                 <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-accent) 0%, transparent 100%);">
                     <h5 class="mb-0 text-white">
@@ -313,7 +313,6 @@
         </div>
     </div>
 
-    <!-- Sección de Reseñas -->
     <div class="row mt-5">
         <div class="col-12">
             <div class="card bg-dark border-0 shadow">
