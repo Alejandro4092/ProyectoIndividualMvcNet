@@ -3,8 +3,6 @@
 @{
     ViewData["Title"] = "Mi Perfil";
     var mensaje = ViewBag.Mensaje as string;
-    // Badges de logros
-    var favs = "<script>document.write((getFavoritos && getFavoritos().length) || 0)</script>";
 }
 
 <!-- Breadcrumb -->
@@ -195,20 +193,6 @@
                     </ul>
                 </div>
             </div>
-            <!-- Logros -->
-            <div class="card bg-dark border-0 shadow-lg mb-4">
-                <div class="card-header border-0 py-3" style="background: linear-gradient(90deg, var(--gaming-accent, #ff006e) 0%, transparent 100%);">
-                    <h5 class="mb-0 text-white">
-                        <i class="bi bi-award me-2"></i>Logros
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <span class="badge bg-success me-2">Primer inicio de sesión</span>
-                    <span class="badge bg-primary me-2" id="badge-fav">Favoritos: <span id="badge-fav-count">0</span></span>
-                    <span class="badge bg-warning text-dark me-2">Primer juego comprado</span>
-                    <!-- Puedes añadir más logros visuales aquí -->
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -217,14 +201,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/favoritos.js" asp-append-version="true"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (window.getFavoritos) {
-                document.getElementById('badge-fav-count').textContent = getFavoritos().length;
-            }
-        });
-    </script>
 }
 
 <style>

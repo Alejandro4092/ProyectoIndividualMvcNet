@@ -385,12 +385,5 @@ namespace ProyectoIndividualMvcNet.Repositories
         {
             return await this.context.Juegos.OrderBy(j => j.Titulo).ToListAsync();
         }
-
-        public async Task<List<Juego>> GetJuegosByIdsAsync(List<int> ids)
-        {
-            if (ids == null || ids.Count == 0)
-                return new List<Juego>();
-            return await this.context.Juegos.Where(j => ids.Contains(j.Id)).ToListAsync();
-        }
     }
 }

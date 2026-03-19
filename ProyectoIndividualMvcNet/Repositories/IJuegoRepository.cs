@@ -1,6 +1,6 @@
-using ProyectoIndividualMvcNet.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ProyectoIndividualMvcNet.Models;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
@@ -8,10 +8,33 @@ namespace ProyectoIndividualMvcNet.Repositories
     {
         Task<List<Juego>> GetJuegosAsync();
         Task<Juego> FindJuegoAsync(int idJuego);
-        Task<List<Juego>> GetJuegosPlataformaGeneroAsync(string? texto, string? genero, string? plataforma);
-        Task InsertJuegoAsync(string titulo, string descripcion, decimal precio, int stock, string genero, string plataforma, string img, bool activo);
+        Task<List<Juego>> GetJuegosPlataformaGeneroAsync(
+            string? texto,
+            string? genero,
+            string? plataforma
+        );
+        Task InsertJuegoAsync(
+            string titulo,
+            string descripcion,
+            decimal precio,
+            int stock,
+            string genero,
+            string plataforma,
+            string img,
+            bool activo
+        );
         Task EliminarJuegoAsync(int id);
-        Task EditJuegoAsync(int id, string titulo, string descripcion, decimal precio, int stock, string genero, string plataforma, string img, bool activo);
+        Task EditJuegoAsync(
+            int id,
+            string titulo,
+            string descripcion,
+            decimal precio,
+            int stock,
+            string genero,
+            string plataforma,
+            string img,
+            bool activo
+        );
         Task ComprarJuegoAsync(int idUsuario, int idJuego, decimal precio);
         Task<List<CompraRealizada>> GetJuegosCompradosAsync(int idUsuario);
         Task ProcesarPedidoCarritoAsync(int idUsuario, List<Juego> carrito);
@@ -21,9 +44,18 @@ namespace ProyectoIndividualMvcNet.Repositories
         Task<List<Resena>> GetAllResenasAsync();
         Task<List<GeneroDistribucionDto>> GetDistribucionJuegosPorGeneroAsync();
         Task<List<VentasMensualesDto>> GetTendenciaVentasMensualesAsync(int meses = 6);
-        Task<int> GetNumeroJuegosFiltradosSpAsync(string? texto, string? genero, string? plataforma);
-        Task<List<Juego>> GetGrupoJuegosFiltradosSpAsync(int page, int pageSize, string? texto, string? genero, string? plataforma);
+        Task<int> GetNumeroJuegosFiltradosSpAsync(
+            string? texto,
+            string? genero,
+            string? plataforma
+        );
+        Task<List<Juego>> GetGrupoJuegosFiltradosSpAsync(
+            int page,
+            int pageSize,
+            string? texto,
+            string? genero,
+            string? plataforma
+        );
         Task<List<Juego>> GetTodosJuegosAsync();
-        Task<List<Juego>> GetJuegosByIdsAsync(List<int> ids); // Añadido para favoritos por sesión
     }
 }
