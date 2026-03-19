@@ -328,5 +328,13 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             return View();
         }
+
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> AdminJuegos()
+        {
+            var juegos = await this.repo.GetTodosJuegosAsync();
+            return View(juegos);
+        }
     }
 }

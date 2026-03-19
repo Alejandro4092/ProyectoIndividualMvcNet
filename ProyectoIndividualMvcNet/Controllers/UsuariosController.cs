@@ -42,13 +42,18 @@ namespace ProyectoIndividualMvcNet.Controllers
 
         [AuthorizeUsuarios]
         [HttpPost]
-        public async Task<IActionResult> Perfil(Usuario user)
+        public async Task<IActionResult> Perfil(Usuario user, IFormFile avatarFile)
         {
+            string imagenBase64 = user.Imagen;
+            if (avatarFile != null && avatarFile.Length > 0)
+            {
+                imagenBase64 = await this.imageHelper.ConvertToBase64Async(avatarFile);
+            }
             await this.repo.UpdatePerfilSinPasswordAsync(
                 user.IdUsuario,
                 user.Nombre,
                 user.Email,
-                user.Imagen
+                imagenBase64
             );
 
             Usuario usuarioActualizado = await this.repo.FindUsuarioAsync(user.IdUsuario);

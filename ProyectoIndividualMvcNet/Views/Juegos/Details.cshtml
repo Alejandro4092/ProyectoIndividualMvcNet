@@ -128,8 +128,8 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button class="btn btn-outline-light">
-                            <i class="bi bi-heart me-2"></i>Añadir a Favoritos
+                        <button type="button" class="btn btn-outline-light btn-fav" data-juego-id="@Model.Id">
+                            <i class="bi bi-heart"></i> Añadir a Favoritos
                         </button>
                         <button class="btn btn-outline-light">
                             <i class="bi bi-share me-2"></i>Compartir
@@ -473,5 +473,6 @@
 }
 
     @section Scripts {
+    <script src="~/js/favoritos.js" asp-append-version="true"></script>
     <script src="~/js/juegos-details.js" asp-append-version="true"></script>
 }

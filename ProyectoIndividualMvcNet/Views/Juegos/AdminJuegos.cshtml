@@ -1,0 +1,103 @@
+@model IEnumerable<ProyectoIndividualMvcNet.Models.Juego>
+@{
+    ViewData["Title"] = "Gestión de Juegos (Admin)";
+}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5 fw-bold text-white mb-3">
+                <i class="bi bi-gear-fill me-2" style="color: var(--gaming-primary, #00ff88);"></i>
+                Gestión de Juegos (Admin)
+            </h1>
+            <p class="lead text-white-50">Ver y administrar todos los juegos, incluyendo los inactivos.</p>
+        </div>
+        <div class="col text-end align-self-center">
+            <a asp-action="Create" class="btn btn-lg btn-success">
+                <i class="bi bi-plus-circle-fill me-2"></i>Nuevo Juego
+            </a>
+        </div>
+    </div>
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Género</th>
+                            <th>Plataforma</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var juego in Model)
+                        {
+                            <tr>
+                                <td>@juego.Titulo</td>
+                                <td>@juego.Genero</td>
+                                <td>@juego.Plataforma</td>
+                                <td>@juego.Precio.ToString("C")</td>
+                                <td>@juego.Stock</td>
+                                <td>
+                                    @if (juego.Activo)
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Inactivo</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-idjuego="@juego.Id" class="btn btn-sm btn-warning me-2">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <form asp-action="Delete" method="post" class="d-inline form-eliminar-juego">
+                                        <input type="hidden" name="idjuego" value="@juego.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger btn-eliminar-juego" data-titulo="@juego.Titulo">
+                                            <i class="bi bi-trash3"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/juegos-index.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.form-eliminar-juego').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    var btn = form.querySelector('.btn-eliminar-juego');
+                    var titulo = btn ? btn.getAttribute('data-titulo') : 'este juego';
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: `¿Deseas eliminar "${titulo}"? Esta acción no se puede deshacer.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

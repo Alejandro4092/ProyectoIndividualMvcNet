@@ -1,0 +1,89 @@
+@using ProyectoIndividualMvcNet.Models
+@model IEnumerable<Juego>
+@{
+    ViewData["Title"] = "Mis Favoritos";
+}
+
+<div class="container mt-5 mb-5">
+    <h1 class="display-4 fw-bold mb-4 text-white">
+        <i class="bi bi-heart-fill me-2" style="color: var(--gaming-accent, #ff006e);"></i>
+        Mis Juegos Favoritos
+    </h1>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var juego in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 bg-dark border-0 shadow-lg game-card">
+                        <div class="position-relative overflow-hidden" style="height: 250px;">
+                            @if (!string.IsNullOrEmpty(juego.Img))
+                            {
+                                <img src="@juego.Img" class="card-img-top object-fit-cover h-100" alt="@juego.Titulo">
+                            }
+                            else
+                            {
+                                <div class="bg-secondary d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-controller text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            }
+                            <button type="button" class="btn btn-fav position-absolute bottom-0 end-0 m-2 active" data-juego-id="@juego.Id" title="Quitar de Favoritos">
+                                <i class="bi bi-heart-fill"></i>
+                            </button>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-white fw-bold text-truncate mb-2" title="@juego.Titulo">
+                                @juego.Titulo
+                            </h5>
+                            <p class="card-text text-muted small mb-3" style="height: 60px; overflow: hidden;">
+                                @(juego.Descripcion?.Length > 100 ? juego.Descripcion.Substring(0, 100) + "..." : juego.Descripcion)
+                            </p>
+                            <div class="mb-3">
+                                @if (!string.IsNullOrEmpty(juego.Genero))
+                                {
+                                    <span class="badge bg-primary me-1">
+                                        <i class="bi bi-tag-fill me-1"></i>@juego.Genero
+                                    </span>
+                                }
+                                @if (!string.IsNullOrEmpty(juego.Plataforma))
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-joystick me-1"></i>@juego.Plataforma
+                                    </span>
+                                }
+                            </div>
+                            <div class="mt-auto">
+                                <div class="text-center mb-3">
+                                    <h3 class="fw-bold mb-0" style="color: var(--gaming-primary, #00ff88);">
+                                        @juego.Precio.ToString("C")
+                                    </h3>
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-seam me-1"></i>Stock: @juego.Stock
+                                    </small>
+                                </div>
+                                <a asp-action="Details" asp-route-idjuego="@juego.Id" class="btn btn-outline-light w-100 mb-2">
+                                    <i class="bi bi-eye me-2"></i>Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill me-3" style="font-size: 2rem;"></i>
+            <div>
+                <h4 class="alert-heading">No tienes juegos favoritos</h4>
+                <p class="mb-0">Añade juegos a favoritos para verlos aquí.</p>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/favoritos.js" asp-append-version="true"></script>
+}

@@ -1,4 +1,6 @@
 using ProyectoIndividualMvcNet.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
@@ -21,5 +23,7 @@ namespace ProyectoIndividualMvcNet.Repositories
         Task<List<VentasMensualesDto>> GetTendenciaVentasMensualesAsync(int meses = 6);
         Task<int> GetNumeroJuegosFiltradosSpAsync(string? texto, string? genero, string? plataforma);
         Task<List<Juego>> GetGrupoJuegosFiltradosSpAsync(int page, int pageSize, string? texto, string? genero, string? plataforma);
+        Task<List<Juego>> GetTodosJuegosAsync();
+        Task<List<Juego>> GetJuegosByIdsAsync(List<int> ids); // Añadido para favoritos por sesión
     }
 }
