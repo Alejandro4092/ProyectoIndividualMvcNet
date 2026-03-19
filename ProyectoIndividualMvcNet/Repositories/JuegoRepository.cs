@@ -385,5 +385,16 @@ namespace ProyectoIndividualMvcNet.Repositories
         {
             return await this.context.Juegos.OrderBy(j => j.Titulo).ToListAsync();
         }
+
+        public async Task<List<Juego>> GetJuegosMejorValoradosAsync(int top = 5)
+        {
+            return await this.context.Juegos
+                .Include(j => j.Resenas)
+                .Where(j => j.Resenas.Any())
+                .OrderByDescending(j => j.Resenas.Average(r => (double?)r.Nota) ?? 0)
+                .ThenByDescending(j => j.Resenas.Count)
+                .Take(top)
+                .ToListAsync();
+        }
     }
 }

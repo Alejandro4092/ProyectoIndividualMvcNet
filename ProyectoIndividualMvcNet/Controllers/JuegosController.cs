@@ -321,11 +321,9 @@ namespace ProyectoIndividualMvcNet.Controllers
             }
 
             ViewBag.TopVentas = await this.repo.GetJuegosMasVendidosAsync();
-
             ViewBag.DistribucionGeneros = await this.repo.GetDistribucionJuegosPorGeneroAsync();
-
             ViewBag.TendenciaVentas = await this.repo.GetTendenciaVentasMensualesAsync(6);
-
+            ViewBag.RankingValorados = await this.repo.GetJuegosMejorValoradosAsync(5);
             return View();
         }
 
@@ -335,6 +333,13 @@ namespace ProyectoIndividualMvcNet.Controllers
         {
             var juegos = await this.repo.GetTodosJuegosAsync();
             return View(juegos);
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> RankingJuegosValorados()
+        {
+            var ranking = await repo.GetJuegosMejorValoradosAsync(5); // o el número que quieras
+            return View(ranking);
         }
     }
 }

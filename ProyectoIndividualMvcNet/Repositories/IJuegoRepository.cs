@@ -57,5 +57,6 @@ namespace ProyectoIndividualMvcNet.Repositories
             string? plataforma
         );
         Task<List<Juego>> GetTodosJuegosAsync();
+        Task<List<Juego>> GetJuegosMejorValoradosAsync(int top = 5);
     }
 }

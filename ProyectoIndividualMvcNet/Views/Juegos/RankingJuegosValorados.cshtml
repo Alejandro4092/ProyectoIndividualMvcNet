@@ -1,0 +1,176 @@
+@model List<ProyectoIndividualMvcNet.Models.Juego>
+@{
+    ViewData["Title"] = "Juegos Mejor Valorados";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --glass-bg: rgba(25, 25, 35, 0.85);
+        --neon-cyan: #00d9ff;
+        --neon-blue: #007cf0;
+        --gold: #ffc107;
+        --silver: #e2e2e2;
+        --bronze: #cd7f32;
+    }
+
+    body {
+        background-color: #0f0f13; /* Fondo más profundo */
+        font-family: 'Inter', sans-serif;
+    }
+
+    .gaming-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .ranking-header {
+        background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%);
+        padding: 2rem;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .table-gaming {
+        margin-bottom: 0;
+        color: #e0e0e0;
+    }
+
+        .table-gaming thead th {
+            background: rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border: none;
+            padding: 1.2rem;
+        }
+
+        .table-gaming tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .table-gaming tbody tr:hover {
+                background: rgba(255, 255, 255, 0.05) !important;
+                transform: scale(1.005);
+            }
+
+    /* Estilos para el Top 3 */
+    .rank-1 {
+        color: var(--gold);
+        font-size: 1.5rem;
+        text-shadow: 0 0 10px rgba(255,193,7,0.4);
+    }
+
+    .rank-2 {
+        color: var(--silver);
+        font-size: 1.3rem;
+    }
+
+    .rank-3 {
+        color: var(--bronze);
+        font-size: 1.2rem;
+    }
+
+    .game-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid rgba(255,255,255,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    tr:hover .game-img {
+        transform: rotate(-5deg) scale(1.1);
+        border-color: var(--neon-cyan);
+    }
+
+    .rating-badge {
+        background: rgba(255, 193, 7, 0.15);
+        color: var(--gold);
+        border: 1px solid var(--gold);
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+    }
+
+    .reviews-badge {
+        background: rgba(0, 217, 255, 0.1);
+        color: var(--neon-cyan);
+        border: 1px solid var(--neon-cyan);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="container-lg my-5" style="max-width: 1000px;">
+    <div class="gaming-card">
+        <div class="ranking-header text-center text-md-start">
+            <h2 class="mb-1 fw-bold" style="font-family: 'Orbitron', sans-serif; letter-spacing: 2px; color: white;">
+                <i class="bi bi-trophy-fill me-2 text-warning"></i> HALL OF FAME
+            </h2>
+            <p class="mb-0 opacity-75">Los títulos mejor valorados por nuestra comunidad</p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-gaming align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center">Pos</th>
+                        <th>Videojuego</th>
+                        <th class="d-none d-md-table-cell">Género</th>
+                        <th class="text-center">Valoración</th>
+                        <th class="text-center">Reseñas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var juego = Model[i];
+                        var rankClass = i == 0 ? "rank-1" : i == 1 ? "rank-2" : i == 2 ? "rank-3" : "";
+                        var promedio = juego.Resenas != null && juego.Resenas.Any()
+                        ? juego.Resenas.Average(r => r.Nota)
+                        : 0;
+
+                        <tr>
+                            <td class="text-center fw-bold @rankClass">
+                                @(i + 1)
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="@(string.IsNullOrEmpty(juego.Img) ? "/img/no-image.png" : juego.Img)"
+                                         alt="@juego.Titulo" class="game-img me-3">
+                                    <div>
+                                        <div class="fw-bold text-white mb-0" style="font-size: 1.1rem;">@juego.Titulo</div>
+                                        <small class="text-muted d-md-none">@juego.Genero</small>
+                                        <div class="text-muted d-none d-md-block" style="font-size: 0.85rem;">@juego.Plataforma</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                <span class="badge rounded-pill bg-secondary bg-opacity-25">@juego.Genero</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="rating-badge">
+                                    <i class="bi bi-star-fill me-1"></i>
+                                    @(promedio > 0 ? promedio.ToString("0.0") : "N/A")
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="reviews-badge">
+                                    <i class="bi bi-chat-left-text me-1"></i>
+                                    @((juego.Resenas != null) ? juego.Resenas.Count() : 0)
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
