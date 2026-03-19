@@ -17,5 +17,6 @@ namespace ProyectoIndividualMvcNet.Repositories
         Task DeleteUsuarioAsync(int idUsuario);
         Task<List<Resena>> GetTodasResenasAsync();
         Task DeleteResenaAsync(int idResena);
+        Task<List<UsuarioRankingDto>> GetRankingUsuariosPorComprasAsync(int top = 10);
     }
 }

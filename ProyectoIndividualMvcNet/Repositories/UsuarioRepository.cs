@@ -4,9 +4,21 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using ProyectoIndividualMvcNet.Data;
 using ProyectoIndividualMvcNet.Helpers;
 using ProyectoIndividualMvcNet.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ProyectoIndividualMvcNet.Repositories
 {
+    public class UsuarioRankingDto
+    {
+        public int IdUsuario { get; set; }
+        public string Nombre { get; set; }
+        public string Email { get; set; }
+        public string Imagen { get; set; }
+        public int TotalCompras { get; set; }
+    }
+
     public class UsuarioRepository : IUsuarioRepository
     {
         private TiendaJuegosContext context;
@@ -182,6 +194,25 @@ namespace ProyectoIndividualMvcNet.Repositories
                 this.context.Resenas.Remove(resena);
                 await this.context.SaveChangesAsync();
             }
+        }
+
+        // Ranking de usuarios con más compras
+        public async Task<List<UsuarioRankingDto>> GetRankingUsuariosPorComprasAsync(int top = 10)
+        {
+            var ranking = await this.context.Usuarios
+                .Select(u => new UsuarioRankingDto
+                {
+                    IdUsuario = u.IdUsuario,
+                    Nombre = u.Nombre,
+                    Email = u.Email,
+                    Imagen = u.Imagen,
+                    TotalCompras = u.Pedidos.Count()
+                })
+                .OrderByDescending(u => u.TotalCompras)
+                .ThenBy(u => u.Nombre)
+                .Take(top)
+                .ToListAsync();
+            return ranking;
         }
     }
 }

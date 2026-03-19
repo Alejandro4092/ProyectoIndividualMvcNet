@@ -1,0 +1,177 @@
+@model List<ProyectoIndividualMvcNet.Repositories.UsuarioRankingDto>
+@{
+    ViewData["Title"] = "Ranking de Usuarios con Más Compras";
+}
+
+<style>
+    .ranking-wrapper {
+        max-width: 950px;
+        margin: 2.5rem auto 2.5rem auto;
+    }
+    .ranking-header {
+        background: linear-gradient(90deg, #00d9ff 0%, #007cf0 100%);
+        color: #fff;
+        border-radius: 1rem 1rem 0 0;
+        padding: 2rem 1.5rem 1rem 1.5rem;
+        margin-bottom: 0;
+        box-shadow: 0 4px 24px 0 #00d9ff33;
+        font-family: 'Orbitron', 'Rajdhani', sans-serif;
+    }
+    .ranking-header .trophy {
+        font-size: 2.2rem;
+        margin-right: 1rem;
+        vertical-align: middle;
+        color: #fff;
+        filter: drop-shadow(0 0 8px #00d9ff);
+    }
+    .ranking-table {
+        background: #181b20;
+        border-radius: 0 0 1rem 1rem;
+        box-shadow: 0 4px 24px 0 #00d9ff22;
+        overflow: hidden;
+    }
+    .ranking-table th, .ranking-table td {
+        border: none !important;
+        vertical-align: middle;
+    }
+    .ranking-table thead th {
+        color: #00d9ff;
+        font-family: 'Rajdhani', 'Orbitron', sans-serif;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        background: #181b20;
+        border-bottom: 2px solid #00d9ff !important;
+    }
+    .ranking-table tbody tr {
+        border-bottom: 1px solid #23262b;
+    }
+    .ranking-table tbody tr:last-child {
+        border-bottom: none;
+    }
+    .ranking-pos {
+        font-weight: bold;
+        font-size: 1.2rem;
+        width: 48px;
+        text-align: center;
+    }
+    .medal-gold, .medal-silver, .medal-bronze, .medal-default {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0 auto;
+        border: 3px solid #23262b;
+        box-shadow: 0 0 0 4px #23262b, 0 4px 16px 0 #0008;
+        position: relative;
+        z-index: 1;
+    }
+        .medal-gold {
+        background: radial-gradient(circle, #ffe066 60%, #ffb700 100%);
+        color: #222;
+        box-shadow: 0 0 12px 2px #ffe06699;
+    }
+    .medal-silver {
+        background: radial-gradient(circle, #e0e0e0 60%, #bdbdbd 100%);
+        color: #222;
+        box-shadow: 0 0 12px 2px #e0e0e099;
+    }
+    .medal-bronze {
+        background: radial-gradient(circle, #ffb47b 60%, #ff7f00 100%);
+        color: #222;
+        box-shadow: 0 0 12px 2px #ffb47b99;
+    }
+    .medal-default {
+        background: #23262b;
+        color: #aaa;
+    }
+    .ranking-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #00d9ff44;
+        background: #23262b;
+        box-shadow: 0 0 8px #00d9ff33;
+    }
+    .ranking-name {
+        font-weight: bold;
+        color: #00d9ff;
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+        font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    }
+    .badge-compras {
+        background: #00d9ff;
+        color: #181b20;
+        font-weight: bold;
+        font-size: 1rem;
+        border-radius: 1.5rem;
+        padding: 0.5em 1.2em;
+        box-shadow: 0 0 8px #00d9ff55;
+        font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    }
+    @@media (max-width: 992px) {
+        .ranking-wrapper {
+            max-width: 98vw;
+            margin: 1.2rem auto;
+        }
+    }
+    @@media (max-width: 576px) {
+        .ranking-header {
+            padding: 1.2rem 0.7rem 0.7rem 0.7rem;
+            font-size: 1.1rem;
+        }
+        .ranking-table th, .ranking-table td {
+            font-size: 0.95rem;
+            padding: 0.5rem 0.3rem;
+        }
+        .ranking-name {
+            font-size: 1rem;
+        }
+        .badge-compras {
+            font-size: 0.95rem;
+            padding: 0.4em 0.8em;
+        }
+    }
+</style>
+
+<div class="container-lg ranking-wrapper">
+    <div class="ranking-header d-flex align-items-center justify-content-between flex-wrap">
+        <div>
+            <i class="bi bi-trophy-fill trophy"></i>
+            <span style="font-size:1.7rem; font-weight:700;">Ranking de Usuarios Más Compradores</span>
+            <div style="font-size:1rem; color:#e0f7fa; opacity:0.8;">Usuarios más activos de la tienda</div>
+        </div>
+    </div>
+    <div class="ranking-table table-responsive p-0">
+        <table class="table table-dark table-striped table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ranking-pos">#</th>
+                    <th class="text-center">Nombre</th>
+                    <th class="text-center">Total Compras</th>
+                </tr>
+            </thead>
+            <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var medalClass = i == 0 ? "medal-gold" : i == 1 ? "medal-silver" : i == 2 ? "medal-bronze" : "medal-default";
+                <tr>
+                    <td class="ranking-pos">
+                        <span class="@medalClass">@(i + 1)</span>
+                    </td>
+                    <td class="ranking-name text-center">@Model[i].Nombre</td>
+                    <td class="text-center">
+                        <span class="badge badge-compras">@Model[i].TotalCompras</span>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

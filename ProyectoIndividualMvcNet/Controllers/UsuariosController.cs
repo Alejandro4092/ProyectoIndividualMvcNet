@@ -30,6 +30,11 @@ namespace ProyectoIndividualMvcNet.Controllers
         [AuthorizeUsuarios]
         public async Task<IActionResult> Perfil()
         {
+            if (User?.Identity?.IsAuthenticated != true)
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
+            }
             Usuario sessionUser = HttpContext.Session.GetObject<Usuario>("USUARIO");
             if (sessionUser == null)
             {
@@ -142,7 +147,11 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity)
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = false // Cookie de sesión, no persistente
+                }
             );
 
             // Redirección a la ruta guardada por el filtro
@@ -213,6 +222,14 @@ namespace ProyectoIndividualMvcNet.Controllers
             await this.repo.DeleteUsuarioAsync(idUsuario);
             TempData["Mensaje"] = "Usuario eliminado correctamente.";
             return RedirectToAction("AdminUsuarios");
+        }
+
+        [AuthorizeUsuarios]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<IActionResult> Ranking()
+        {
+            var ranking = await this.repo.GetRankingUsuariosPorComprasAsync(20);
+            return View(ranking);
         }
     }
 }
