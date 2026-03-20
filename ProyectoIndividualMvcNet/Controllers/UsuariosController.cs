@@ -150,7 +150,7 @@ namespace ProyectoIndividualMvcNet.Controllers
                 new ClaimsPrincipal(identity),
                 new AuthenticationProperties
                 {
-                    IsPersistent = false // Cookie de sesión, no persistente
+                    IsPersistent = false, // Cookie de sesión, no persistente
                 }
             );
 
@@ -225,7 +225,6 @@ namespace ProyectoIndividualMvcNet.Controllers
         }
 
         [AuthorizeUsuarios]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Ranking()
         {
             var ranking = await this.repo.GetRankingUsuariosPorComprasAsync(20);

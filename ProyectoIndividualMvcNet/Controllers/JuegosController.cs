@@ -335,7 +335,6 @@ namespace ProyectoIndividualMvcNet.Controllers
             return View(juegos);
         }
 
-        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> RankingJuegosValorados()
         {
             var ranking = await repo.GetJuegosMejorValoradosAsync(5); // o el número que quieras
