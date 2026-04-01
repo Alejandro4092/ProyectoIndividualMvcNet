@@ -22,6 +22,34 @@ namespace ProyectoIndividualMvcNet.Controllers
             this.imageHelper = imageHelper;
         }
 
+       
+        private async Task<Usuario> GetUsuarioFromSessionOrClaimsAsync()
+        {
+            // 1. Intentar desde sesión primero (caso normal)
+            Usuario sessionUser = HttpContext.Session.GetObject<Usuario>("USUARIO");
+            if (sessionUser != null) return sessionUser;
+
+            // 2. Sesión vacía pero cookie de claims aún válida → reconstruir
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                string idStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(idStr, out int userId))
+                {
+                    Usuario user = await this.repo.FindUsuarioAsync(userId);
+                    if (user != null)
+                    {
+                        HttpContext.Session.SetObject("USUARIO", user);
+                        HttpContext.Session.SetString("NOMBRE", user.Nombre);
+                        HttpContext.Session.SetString("IMAGEN", user.Imagen ?? "");
+                    }
+                    return user;
+                }
+            }
+
+            return null;
+        }
+
+
         public IActionResult ErrorAcceso()
         {
             return View();
@@ -30,16 +58,8 @@ namespace ProyectoIndividualMvcNet.Controllers
         [AuthorizeUsuarios]
         public async Task<IActionResult> Perfil()
         {
-            if (User?.Identity?.IsAuthenticated != true)
-            {
-                HttpContext.Session.Clear();
-                return RedirectToAction("Login");
-            }
-            Usuario sessionUser = HttpContext.Session.GetObject<Usuario>("USUARIO");
-            if (sessionUser == null)
-            {
-                return RedirectToAction("Login");
-            }
+            Usuario sessionUser = await GetUsuarioFromSessionOrClaimsAsync();
+            if (sessionUser == null) return RedirectToAction("Login");
 
             Usuario user = await this.repo.FindUsuarioAsync(sessionUser.IdUsuario);
             return View(user);
@@ -54,6 +74,7 @@ namespace ProyectoIndividualMvcNet.Controllers
             {
                 imagenBase64 = await this.imageHelper.ConvertToBase64Async(avatarFile);
             }
+
             await this.repo.UpdatePerfilSinPasswordAsync(
                 user.IdUsuario,
                 user.Nombre,
@@ -65,7 +86,7 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             HttpContext.Session.SetObject("USUARIO", usuarioActualizado);
             HttpContext.Session.SetString("NOMBRE", usuarioActualizado.Nombre);
-            HttpContext.Session.SetString("IMAGEN", usuarioActualizado.Imagen);
+            HttpContext.Session.SetString("IMAGEN", usuarioActualizado.Imagen ?? "");
 
             ViewData["MENSAJE"] = "¡Perfil actualizado correctamente!";
             return View(usuarioActualizado);
@@ -96,17 +117,8 @@ namespace ProyectoIndividualMvcNet.Controllers
 
         public IActionResult Login()
         {
-            // Si ya hay cookie auth, fuera del login
             if (User?.Identity?.IsAuthenticated == true)
-            {
                 return RedirectToAction("Index", "Juegos");
-            }
-
-            // Mantengo tu check por sesión también
-            if (HttpContext.Session.GetObject<Usuario>("USUARIO") != null)
-            {
-                return RedirectToAction("Index", "Juegos");
-            }
 
             return View();
         }
@@ -124,7 +136,7 @@ namespace ProyectoIndividualMvcNet.Controllers
 
             HttpContext.Session.SetObject("USUARIO", user);
             HttpContext.Session.SetString("NOMBRE", user.Nombre);
-            HttpContext.Session.SetString("IMAGEN", user.Imagen);
+            HttpContext.Session.SetString("IMAGEN", user.Imagen ?? "");
 
             ClaimsIdentity identity = new ClaimsIdentity(
                 CookieAuthenticationDefaults.AuthenticationScheme,
@@ -145,27 +157,26 @@ namespace ProyectoIndividualMvcNet.Controllers
                 identity.AddClaim(new Claim(ClaimTypes.Role, "USER"));
             }
 
+            // IsPersistent = true → la cookie sobrevive al cierre del navegador/app
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(identity),
                 new AuthenticationProperties
                 {
-                    IsPersistent = false, // Cookie de sesión, no persistente
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
                 }
             );
 
-            // Redirección a la ruta guardada por el filtro
+         
             if (TempData["controller"] != null && TempData["action"] != null)
             {
                 string controller = TempData["controller"]!.ToString()!;
                 string action = TempData["action"]!.ToString()!;
                 string httpMethod = TempData["httpMethod"]?.ToString() ?? "GET";
 
-                // Si la acción original era POST, redirige al catálogo
                 if (httpMethod == "POST")
-                {
                     return RedirectToAction("Index", "Juegos");
-                }
 
                 if (TempData["id"] != null)
                 {
@@ -191,12 +202,9 @@ namespace ProyectoIndividualMvcNet.Controllers
         [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> AdminUsuarios()
         {
-            Usuario user = HttpContext.Session.GetObject<Usuario>("USUARIO");
-
+            Usuario user = await GetUsuarioFromSessionOrClaimsAsync();
             if (user == null || user.RolId != 1)
-            {
                 return RedirectToAction("Index", "Juegos");
-            }
 
             List<Usuario> usuarios = await this.repo.GetUsuariosAsync();
             ViewBag.Resenas = await this.repo.GetTodasResenasAsync();
